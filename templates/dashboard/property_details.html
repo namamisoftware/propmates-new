@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ property.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- 🔥 TOP SECTION -->
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+
+    <!-- Title + Price Row -->
+    <div class="flex justify-between items-center flex-wrap gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">
+            {{ property.title }}
+        </h1>
+
+        <div class="text-right">
+            <p class="text-3xl font-bold text-red-600">₹{{ property.price }} {{ property.price_type }}</p>
+            <p class="text-sm text-gray-500 font-medium">
+                EMI - ₹16k | <a href="#" class="text-blue-600 underline">How much loan?</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Sub Details (Beds, Baths etc) -->
+    <div class="flex gap-6 text-gray-700 mt-3">
+        <p class="flex items-center gap-1"><b>Category:</b> {{ property.category|title }}</p>
+        <p class="flex items-center gap-1"><b>Subtype:</b> {{ property.subtype|title }}</p>
+        <p class="flex items-center gap-1"><b>Status:</b> {{ property.property_status }}</p>
+        <p class="flex items-center gap-1"><b>Furnishing:</b> {{ property.furnishing }}</p>
+    </div>
+
+    <!-- Images -->
+    {% if images %}
+    <div class="grid grid-cols-3 gap-4 mt-6">
+        <div class="col-span-2">
+            <img src="{{ images.0.image.url }}" class="rounded-xl shadow w-full h-[350px] object-cover"/>
+        </div>
+
+        <div class="grid grid-rows-3 gap-3">
+            {% for img in images|slice:"1:4" %}
+            <img src="{{ img.image.url }}" class="rounded-lg shadow h-[110px] object-cover"/>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- CTA Buttons -->
+    <div class="flex gap-4 mt-6">
+        <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold">
+            Contact Owner
+        </button>
+
+        <button class="border border-red-500 text-red-600 hover:bg-red-50 px-6 py-3 rounded-full font-semibold">
+            Get Phone No.
+        </button>
+    </div>
+
+</div>
+
+<!-- 🔥 MORE DETAILS SECTION -->
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+
+    <h2 class="text-xl font-semibold mb-4">More Details</h2>
+
+    <div class="grid grid-cols-2 gap-6">
+
+        <div>
+            <p class="text-gray-500 text-sm">Price Breakup</p>
+            <p class="font-semibold text-gray-900">₹{{ property.price }} {{ property.price_type }}</p>
+        </div>
+
+        <div>
+            <p class="text-gray-500 text-sm">Address</p>
+            <p class="font-semibold text-gray-900">
+                {{ property.address }}, {{ property.city }}, {{ property.state }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-gray-500 text-sm">Super Built-up Area</p>
+            <p class="font-semibold">{{ property.super_area }} sqft</p>
+        </div>
+
+        <div>
+            <p class="text-gray-500 text-sm">Area</p>
+            <p class="font-semibold">{{ property.area_sqft }} sqft</p>
+        </div>
+
+        <div>
+            <p class="text-gray-500 text-sm">Ownership</p>
+            <p class="font-semibold">{{ property.ownership_type }}</p>
+        </div>
+
+        <div>
+            <p class="text-gray-500 text-sm">Furnishing</p>
+            <p class="font-semibold">{{ property.furnishing }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 🔥 SUBTYPE DETAILS -->
+{% if subtype_data %}
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+    <h2 class="text-xl font-semibold mb-3">Subtype Details</h2>
+
+    <table class="w-full rounded-lg overflow-hidden border">
+        <tbody>
+            {% for label, value in subtype_data.items %}
+            <tr class="border-b">
+                <td class="p-3 font-medium bg-gray-50 w-1/3">{{ label }}</td>
+                <td class="p-3">{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- 🔥 AMENITIES -->
+{% if amenities %}
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+    <h2 class="text-xl font-semibold mb-3">Amenities</h2>
+
+    <div class="grid grid-cols-3 gap-3">
+        {% for a in amenities %}
+        <p class="bg-gray-100 p-2 rounded-md">{{ a.name }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- 🔥 AGENT DETAILS -->
+{% if agent %}
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+    <h2 class="text-xl font-semibold mb-3">Agent Details</h2>
+
+    <p><b>Name:</b> {{ agent.name }}</p>
+    <p><b>Email:</b> {{ agent.email }}</p>
+    <p><b>Phone:</b> {{ agent.phone }}</p>
+</div>
+{% endif %}
+
+<!-- 🔥 360 VIEW -->
+{% if image_360 %}
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+    <h2 class="text-xl font-semibold mb-3">360° View</h2>
+    <img src="{{ image_360.image.url }}" class="rounded-xl shadow w-full h-[350px] object-cover"/>
+</div>
+{% endif %}
+
+<!-- 🔥 VIDEO -->
+{% if video %}
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 mt-6">
+    <h2 class="text-xl font-semibold mb-3">Video</h2>
+
+    {% if video.video_url %}
+        <iframe width="100%" height="350" src="{{ video.video_url }}" class="rounded-xl"></iframe>
+    {% elif video.video_file %}
+        <video width="100%" height="350" controls class="rounded-xl">
+            <source src="{{ video.video_file.url }}" type="video/mp4">
+        </video>
+    {% endif %}
+</div>
+{% endif %}
+
+</body>
+</html>    

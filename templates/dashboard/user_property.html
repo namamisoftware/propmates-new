@@ -1,0 +1,242 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %} User Properties {% endblock %}
+      
+{% block content %}
+<main class="app-wrapper">
+  <div class="container-fluid">
+    <div class="main-breadcrumb d-flex align-items-center my-3 position-relative">
+      <h2 class="breadcrumb-title mb-0 flex-grow-1 fs-14">User Properties</h2>
+      <div class="flex-shrink-0">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+            <li class="breadcrumb-item">
+              {% comment %} <a href="{% url 'add_property' %}" class="btn btn-primary" style="color:#fff">Add Property</a> {% endcomment %}
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+    
+    <div class="row">
+      {% if messages %}
+      <div class="container-fluid my-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+              
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <table id="buttons-datatables" class="table table-nowrap table-striped table-bordered w-100">
+              <thead>
+                <tr>
+                  <th>S no.</th>
+                  <th>User Name</th>
+                  <th>Looking To</th>
+                  <th>Property Type</th>
+                  <th>Name</th>
+                  <th>Country</th>
+                  <th>City</th>
+                  <th>Expire Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in property %}
+                <tr>
+                  <td>{{ forloop.counter }}</td> 
+                  <td>{{ row.user_name|default:"N/A" }}</td>
+                  <td>
+                    {% if row.looking_to == 1 %}Buy
+                    {% elif row.looking_to == 2 %}Rent
+                    {% elif row.looking_to == 3 %}Commercial Buy
+                    {% elif row.looking_to == 4 %}Commercial Rent
+                    {% elif row.looking_to == 5 %}New Project
+                    {% else %}Unknown
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if row.property_type %}
+                      {{ row.property_type.name }}
+                    {% else %}
+                      N/A
+                    {% endif %}
+                  </td>
+                  <td>{{ row.name }}</td>
+                  <td>
+                    {% if row.country %}
+                      {{ row.country.name }}
+                    {% else %}
+                      N/A
+                    {% endif %}
+                  </td>
+                  <td>{{ row.city }}</td>
+                  <td>{{ row.expire_at|default:"Not Set" }}</td>
+                  <td>
+                    {% if row.status == 0 %}
+                    <span class="badge bg-warning-subtle text-warning px-2 rounded-3">Pending</span>
+                    {% elif row.status == 1 %}
+                    <span class="badge bg-success-subtle text-success px-2 rounded-3">Approve</span>
+                    {% elif row.status == 2 %}
+                    <span class="badge bg-danger-subtle text-danger px-2 rounded-3">Rejected</span>
+                    {% else %}
+                    <span class="badge bg-warning-subtle text-warning px-2 rounded-3">Unknown</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="dropdown dropdown-menu-end">
+                      <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots"></i>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li>
+                          <a class="dropdown-item" href="">View</a>
+                        </li>
+                        {% if row.status == 0 %}
+                        <li>
+                          <a class="dropdown-item" href="#" onclick="openApproveModal({{ row.id }}); return false;">Approve</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="{% url 'active_property' row.id 2 %}">Reject</a>
+                        </li>
+                        {% endif %}
+                        {% if row.status == 1 %}
+                        <li>
+                          <a class="dropdown-item" href="#" onclick="openUpdateDateModal({{ row.id }}, '{{ row.expire_at|date:"Y-m-d" }}'); return false;">
+                            Update Expire Date
+                          </a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="{% url 'active_property' row.id 2 %}">Reject</a>
+                        </li>
+                        {% endif %}
+                        {% comment %} <li>
+                          <a class="dropdown-item" href="{% url 'delete_user_property' row.id %}" 
+                             onclick="return confirm('Are you sure you want to delete this member?');">Delete</a>
+                        </li> {% endcomment %}
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Approve Property Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Approve Property</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="approveForm" method="GET">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="expireDate" class="form-label">Expiration Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="expireDate" name="expire_date" required>
+            <small class="text-muted">Select when this property approval should expire</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Approve Property</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Update Expire Date Modal -->
+<div class="modal fade" id="updateDateModal" tabindex="-1" aria-labelledby="updateDateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateDateModalLabel">Update Expiration Date</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="updateDateForm" method="GET">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="newExpireDate" class="form-label">New Expiration Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="newExpireDate" name="expire_date" required>
+            <small class="text-muted">Current expiration date: <span id="currentExpireDate" class="fw-bold">-</span></small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Date</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openApproveModal(propertyId) {
+  const form = document.getElementById('approveForm');
+  form.action = `/dashboard/property/active/${propertyId}/1/`;
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('expireDate').setAttribute('min', today);
+  document.getElementById('expireDate').value = '';
+  
+  const modal = new bootstrap.Modal(document.getElementById('approveModal'));
+  modal.show();
+}
+
+function openUpdateDateModal(propertyId, currentDate) {
+  const form = document.getElementById('updateDateForm');
+  form.action = `/dashboard/property/update-date/${propertyId}/`;
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('newExpireDate').setAttribute('min', today);
+  
+  // Set current date display
+  document.getElementById('currentExpireDate').textContent = currentDate || 'Not Set';
+  
+  // Set input value to current date if exists
+  if (currentDate && currentDate !== 'None') {
+    document.getElementById('newExpireDate').value = currentDate;
+  } else {
+    document.getElementById('newExpireDate').value = '';
+  }
+  
+  const modal = new bootstrap.Modal(document.getElementById('updateDateModal'));
+  modal.show();
+}
+
+// Handle approve form submission
+document.getElementById('approveForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const expireDate = document.getElementById('expireDate').value;
+  if (expireDate) {
+    window.location.href = this.action + '?expire_date=' + expireDate;
+  }
+});
+
+// Handle update date form submission
+document.getElementById('updateDateForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const expireDate = document.getElementById('newExpireDate').value;
+  if (expireDate) {
+    window.location.href = this.action + '?expire_date=' + expireDate;
+  }
+});
+</script>
+
+{% endblock content %}

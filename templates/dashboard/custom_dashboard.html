@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1 style="margin-bottom: 20px;">📊 Real Estate Dashboard</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+
+  <div style="background: linear-gradient(135deg, #4facfe, #00f2fe); padding: 25px; border-radius: 12px; color: white;">
+    <h2>Total Properties</h2>
+    <p style="font-size: 2.5rem; font-weight: bold;">{{ total_properties }}</p>
+  </div>
+
+  <div style="background: linear-gradient(135deg, #43e97b, #38f9d7); padding: 25px; border-radius: 12px; color: white;">
+    <h2>Total Agents</h2>
+    <p style="font-size: 2.5rem; font-weight: bold;">{{ total_agents }}</p>
+  </div>
+
+  <div style="background: linear-gradient(135deg, #fa709a, #fee140); padding: 25px; border-radius: 12px; color: white;">
+    <h2>Total Companies</h2>
+    <p style="font-size: 2.5rem; font-weight: bold;">{{ total_companies }}</p>
+  </div>
+
+  <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 25px; border-radius: 12px; color: white;">
+    <h2>Total Blogs</h2>
+    <p style="font-size: 2.5rem; font-weight: bold;">{{ total_blogs }}</p>
+  </div>
+
+  <div style="background: linear-gradient(135deg, #ff9a9e, #fad0c4); padding: 25px; border-radius: 12px; color: white;">
+    <h2>Total Testimonials</h2>
+    <p style="font-size: 2.5rem; font-weight: bold;">{{ total_testimonials }}</p>
+  </div>
+
+  <div style="background: linear-gradient(135deg, #30cfd0, #330867); padding: 25px; border-radius: 12px; color: white;">
+    <h2>Total Sliders</h2>
+    <p style="font-size: 2.5rem; font-weight: bold;">{{ total_sliders }}</p>
+  </div>
+
+</div>
+{% endblock %}

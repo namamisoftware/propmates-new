@@ -1,0 +1,128 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %} PG Property List {% endblock %}
+
+{% block content %}
+<main class="app-wrapper">
+  <div class="container-fluid">
+
+<!-- 🔹 Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 my-3 border-bottom pb-3">
+  <h2 class="breadcrumb-title mb-0 fs-5 fw-bold">PG Property List</h2>
+
+  <div class="flex-grow-1 d-flex justify-content-center">
+    <form method="get" class="d-flex align-items-center gap-3">
+      <input type="text" name="q" class="form-control" placeholder="🔍 Search by room type..." value="{{ search }}" style="min-width:250px;height:44px;">
+      <button class="btn btn-primary px-4" style="height:44px;">Search</button>
+    </form>
+  </div>
+
+  <a href="{% url 'add_property_wizard' %}" class="btn btn-primary text-white px-4 py-2">+ Add PG Property</a>
+</div>
+
+<!-- ⚡ Messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}<button class="btn-close" data-bs-dismiss="alert"></button></div>
+  {% endfor %}
+{% endif %}
+
+<!-- 📋 Table -->
+<div class="card"><div class="card-body">
+<table class="table table-striped table-bordered w-100">
+<thead>
+<tr>
+  <th>#</th>
+  <th>Room Type</th>
+  <th>Furnishing</th>
+  <th>Preferred Gender</th>
+  <th>Price</th>
+  <th>Beds</th>
+  <th>Location</th>
+  <th>Status</th>
+  <th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for p in properties %}
+<tr>
+  <td>{{ forloop.counter }}</td>
+
+  <td>
+    <strong>{{ p.room_type }}</strong><br>
+    <small class="text-muted">Min stay: {{ p.minimum_stay }} months</small>
+  </td>
+
+  <td>{{ p.furnishing }}</td>
+  <td>{{ p.preferred_gender }}</td>
+
+  <td>{{ p.currency }} {{ p.expected_price }}</td>
+
+  <td>{{ p.total_beds }}</td>
+
+  <td>
+    {{ p.city }}, {{ p.state }}<br>
+    <small class="text-muted">{{ p.country }}</small>
+  </td>
+
+  <td>
+    <span id="status-text-{{ p.id }}" class="fw-semibold {% if p.status == 'Active' %}text-success{% elif p.status == 'Inactive' %}text-danger{% else %}text-warning{% endif %}">
+      {{ p.status }}
+    </span>   
+
+    <select class="form-select form-select-sm w-auto mt-2" onchange="update_N_Status({{ p.id }}, this.value, 'pg')">
+      <option value="Active" {% if p.status == 'Active' %}selected{% endif %}>Active</option>
+      <option value="Inactive" {% if p.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+      <option value="Pending" {% if p.status == 'Pending' %}selected{% endif %}>Pending</option>
+    </select>
+  </td>
+
+  <td>
+    <div class="dropdown text-center">
+      <button class="btn p-0" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'property_detail' 'pg' p.id %}">View</a></li>        
+        <li><a class="dropdown-item" href="{% url 'edit_property' p.id %}">Edit</a></li>
+        <li><a class="dropdown-item text-danger" href="{% url 'property_delete' 'pg' p.id %}"  
+         onclick="return confirm('Are you sure you want to delete this commercial property?');">Delete</a></li>     
+      </ul>
+    </div>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="10" class="text-center py-4 text-muted">No PG properties found.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div></div>
+
+</div></main>
+
+<script>
+function update_N_Status(id, new_status, modelType) {
+  fetch(`/dashboard/AllupdateStatus/${id}/`, {  
+    method: "POST",   
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token }}",
+    },
+    body: JSON.stringify({ status: new_status, model: modelType })
+  })
+  .then(res => res.json())
+  .then(data => {
+      if (data.success) {
+        const statusEl = document.getElementById(`status-text-${id}`);
+        statusEl.textContent = data.status;
+        statusEl.classList.remove("text-success","text-danger","text-warning");
+        if (data.status === "Active") statusEl.classList.add("text-success");
+        if (data.status === "Inactive") statusEl.classList.add("text-danger");
+        if (data.status === "Pending") statusEl.classList.add("text-warning");
+      }
+  })
+  .catch(err => console.error(err));  
+}
+</script>
+
+{% endblock content %}         

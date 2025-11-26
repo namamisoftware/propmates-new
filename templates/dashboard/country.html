@@ -1,0 +1,211 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block title %} Country {% endblock %}
+{% block content %}
+<main class="app-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div class="card mt-6">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Country Information</h5>
+          </div>
+          <div class="card-body">
+            <form action="" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row">
+                <!-- Country Dropdown with Select2 -->
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="country" class="form-label">Country</label>
+                    <select id="country" name="name" class="form-select" required>
+                      <option value="">Select Country</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <!-- Mobile Code Prefix -->
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="mobile_code" class="form-label">Mobile Code</label>
+                    <input type="text" class="form-control" id="mobile_code" name="code" readonly required>
+                  </div>
+                </div>
+              
+                <!-- Currency -->
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="currency" class="form-label">Currency</label>
+                    <input type="text" class="form-control" id="currency" name="currency" readonly required>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary">
+                    {% if row %} Update {% else %} Submit {% endif %}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<!-- jQuery (Load first) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+(function() {
+  'use strict';
+  
+  // Store existing data if editing
+  const existingData = {
+    name: "{{ row.name|default:'' }}",
+    code: "{{ row.code|default:'' }}",
+    currency: "{{ row.currency|default:'' }}"
+  };
+  
+  // Wait for DOM and jQuery to be ready
+  jQuery(document).ready(function($) {
+    const countrySelect = $('#country');
+    const mobileCodeInput = $('#mobile_code');
+    const currencyInput = $('#currency');
+
+    // Load country data
+    async function loadCountries() {
+      try {
+        // Fetch countries with currency data
+        const currencyRes = await fetch("https://countriesnow.space/api/v0.1/countries/currency");
+        const currencyData = await currencyRes.json();
+
+        // Fetch countries with dial codes
+        const dialRes = await fetch("https://countriesnow.space/api/v0.1/countries/codes");
+        const dialData = await dialRes.json();
+
+        if (currencyData.data && dialData.data) {
+          // Create a map for dial codes
+          const dialCodeMap = {};
+          dialData.data.forEach(c => {
+            dialCodeMap[c.name] = c.dial_code;
+          });
+
+          // Populate country dropdown
+          currencyData.data.forEach(c => {
+            const dialCode = dialCodeMap[c.name] || "";
+            const option = $('<option></option>')
+              .val(c.name)
+              .text(c.name)
+              .attr('data-currency', c.currency || "")
+              .attr('data-dial-code', dialCode);
+            
+            countrySelect.append(option);
+          });
+
+          // Initialize Select2 AFTER options are added
+          countrySelect.select2({
+            placeholder: "Search and Select Country",
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-5',
+            dropdownAutoWidth: true,
+            matcher: function(params, data) {
+              // If there are no search terms, return all data
+              if ($.trim(params.term) === '') {
+                return data;
+              }
+
+              // Search in country name
+              if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) {
+                return data;
+              }
+
+              // Return null if no match
+              return null;
+            }
+          });
+
+          // Pre-fill data if editing
+          if (existingData.name) {
+            countrySelect.val(existingData.name).trigger('change');
+            mobileCodeInput.val(existingData.code);
+            currencyInput.val(existingData.currency);
+            console.log('Existing data loaded for editing');
+          }
+
+          // On Country Change → auto-fill all fields
+          countrySelect.on('select2:select', function(e) {
+            const selected = $(e.target).find(':selected');
+            const currency = selected.attr('data-currency') || "";
+            const dialCode = selected.attr('data-dial-code') || "";
+
+            currencyInput.val(currency);
+            mobileCodeInput.val(dialCode);
+          });
+
+          // Clear fields when selection is cleared
+          countrySelect.on('select2:clear', function() {
+            currencyInput.val('');
+            mobileCodeInput.val('');
+          });
+
+          console.log('Select2 initialized successfully!');
+        }
+      } catch (err) {
+        console.error("Error loading countries:", err);
+        alert("Failed to load country data. Please refresh the page.");
+      }
+    }
+
+    // Load countries
+    loadCountries();
+  });
+})();
+</script>
+
+<style>
+/* Select2 Bootstrap 5 Theme Customization */
+.select2-container--bootstrap-5 .select2-selection {
+  min-height: 38px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+  padding: 0.375rem 0.75rem;
+}
+
+.select2-dropdown {
+  border-color: #dee2e6;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+  padding-left: 0;
+  line-height: 1.5;
+}
+
+/* Make search box more prominent */
+.select2-search__field {
+  padding: 8px !important;
+  font-size: 14px !important;
+}
+
+.select2-results__option {
+  padding: 8px 12px;
+}
+
+.select2-results__option--highlighted {
+  background-color: #0d6efd !important;
+  color: white !important;
+}
+</style>
+
+{% endblock content %}

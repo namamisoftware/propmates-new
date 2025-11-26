@@ -1,0 +1,103 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %} Blog {% endblock %}
+      
+      {% block content %}
+      <main class="app-wrapper">
+  <div class="container-fluid p-6">
+      <div
+            class="main-breadcrumb d-flex align-items-center my-3 position-relative"
+          >
+            <h2 class="breadcrumb-title mb-0 flex-grow-1 fs-14">Add Blog</h2>
+            <div class="flex-shrink-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-end mb-0">
+                  <li class="breadcrumb-item">
+                    <a href="{% url 'view_blog' %}" class="btn btn-primary" style="color:#fff">View Blogs</a>
+                  </li>
+                 
+                </ol>
+              </nav>
+            </div>
+          </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+          </div>
+          <div class="card-body">
+             <form action="" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="name" class="form-label">Metal Title</label>
+                    <input type="text" class="form-control" id="name" name="meta_title" value="{{ row.meta_title|default:'' }}" required>
+                  </div>
+                </div>
+                 <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="experienceYears" class="form-label">Meta Description </label>
+                  <textarea  class="form-control"   name="meta_description" >{{ row.meta_description|default:'' }}
+                  </textarea>
+
+                  </div>
+                </div>
+              </div>
+                
+              <div class="row">
+                 <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="name" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="name" name="title" value="{{ row.title|default:'' }}" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="post_by" class="form-label">Post By</label>
+                    <input type="text" class="form-control" id="post_by" name="post_by" value="{{ row.post_by|default:'Admin' }}" required>
+                  </div>
+                </div>
+              
+              </div>
+              <div class="row">
+               <div class="col-12">
+  <div class="mb-3">
+    <label for="imageUpload" class="form-label">Upload Image</label>
+    <input type="file" class="form-control" id="imageUpload" name="imageUpload" accept="image/*">
+
+    {% if row.image %}
+      <div class="mt-2">
+        <p class="mb-1">Current Image:</p>
+        <img src="{{ row.image.url }}" alt="Profile Image" width="120" class="rounded shadow-sm">
+      </div>
+    {% endif %}
+  </div>
+</div>
+              
+             <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="experienceYears" class="form-label">Description </label>
+                  <textarea  class="form-control"  id="snowEditor" name="about" >{{ row.about|default:'' }}
+                  </textarea>
+
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                 <button type="submit" class="btn btn-primary">
+  {% if row %} Update {% else %} Submit {% endif %}
+</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock content %}
