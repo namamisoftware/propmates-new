@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Main User</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
+    
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700 text-center">
+        Add New User
+    </h2>
+
+    <form method="POST" class="grid grid-cols-2 gap-4">
+        {% csrf_token %}
+
+        <div class="col-span-2">
+            <label class="block text-gray-600 mb-1">Email</label>
+            <input type="email" name="email" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div class="col-span-2">
+            <label class="block text-gray-600 mb-1">Full Name</label>
+            <input type="text" name="full_name" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+            <label class="block text-gray-600 mb-1">Phone</label>
+            <input type="text" name="phone"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+            <label class="block text-gray-600 mb-1">Country</label>
+            <input type="text" name="Country"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+            <label class="block text-gray-600 mb-1">State</label>
+            <input type="text" name="state"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+            <label class="block text-gray-600 mb-1">City</label>
+            <input type="text" name="city"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div class="col-span-2">
+            <label class="block text-gray-600 mb-1">Pincode</label>
+            <input type="text" name="pincode"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div class="col-span-2">
+            <label class="block text-gray-600 mb-1">Role</label>
+                
+           <select name="role"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="">Select Role</option>
+
+            {% for r in roles %}
+              <option class="text-black" value="{{ r.id }}">
+                {{ r.role }}  
+               </option>
+            {% endfor %}
+           </select>
+
+        </div>
+
+        <div class="col-span-2 text-center mt-4">
+            <button type="submit"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition duration-200 shadow-md">
+                Save User
+            </button>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>
+  

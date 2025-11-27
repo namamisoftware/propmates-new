@@ -1,0 +1,1380 @@
+
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load list_filters %}  
+{% block title %} Our Team {% endblock %}
+      
+      {% block content %}   
+       <main class="app-wrapper">
+        <div class="container-fluid">
+          <div
+            class="main-breadcrumb d-flex align-items-center my-3 position-relative"
+          >
+            <h2 class="breadcrumb-title mb-0 flex-grow-1 fs-14">Property Add</h2>
+            <div class="flex-shrink-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-end mb-0">  
+                  <li class="breadcrumb-item">  
+                    <a href="{% url 'property_list' %}" class="btn btn-primary" style="color:#fff">Properties List</a>
+                  </li>
+                 
+                </ol>
+              </nav>
+            </div>
+          </div>
+          <div class="row">
+           
+            {% if messages %}
+  <div class="container-fluid my-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+    <link rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+     
+          <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>  
+        body {
+            background-color: #f9fafb;
+        }
+        .card {
+            border-radius: 10px;
+        }
+        #map {
+            width: 100%;
+            height: 300px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+
+
+
+
+         .form-input {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent;
+  }
+
+  .checkbox {
+    @apply w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500;
+  }
+
+  .check-item {
+    @apply flex items-center space-x-2 text-sm text-gray-700 hover:text-emerald-700 transition-colors;
+  }   
+        
+
+  .stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 30px auto;
+}
+
+.step {
+  text-align: center;
+  position: relative;
+  flex: 1;
+}
+
+.circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.step.active .circle {
+  background: #007bff; /* Blue */
+}
+
+.step.completed .circle {
+  background: #28a745; /* Green */
+}
+
+.label {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.line {
+  flex: 1;
+  height: 3px;
+  background: #ccc;
+  margin: 0 10px;
+  transition: 0.3s;
+}
+
+.line.completed {
+  background: #28a745;
+}  
+  
+    </style>  
+
+
+    <style>
+     .input {
+        @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none;
+}
+      label {
+        @apply text-gray-700 text-sm;  
+}
+    </style>
+</head>
+
+<body>
+      <div class="stepper">
+
+    <!-- Step 1: Category -->
+    <div class="step {% if step == 'category' %}active{% elif step == 'base1' or step == 'base2' or step == 'form' or step == 'images' or step == 'done' %}completed{% endif %}">
+        <div class="circle">1</div>
+        <div class="label">Choose Category</div>
+    </div>
+    <div class="line {% if step != 'category' %}completed{% endif %}"></div>
+
+    <!-- Step 2: Base1 -->
+    <div class="step {% if step == 'base1' %}active{% elif step == 'base2' or step == 'form' or step == 'images' or step == 'done' %}completed{% endif %}">
+        <div class="circle">2</div>
+        <div class="label">Base Info 1</div>
+    </div>
+    <div class="line {% if step == 'base2' or step == 'form' or step == 'images' or step == 'done' %}completed{% endif %}"></div>
+
+    <!-- Step 3: Base2 -->
+    <div class="step {% if step == 'base2' %}active{% elif step == 'form' or step == 'images' or step == 'done' %}completed{% endif %}">
+        <div class="circle">3</div>
+        <div class="label">Base Info 2</div>
+    </div>
+    <div class="line {% if step == 'form' or step == 'images' or step == 'done' %}completed{% endif %}"></div>
+
+    <!-- Step 4: Form -->
+    <div class="step {% if step == 'form' %}active{% elif step == 'images' or step == 'done' %}completed{% endif %}">
+        <div class="circle">4</div>
+        <div class="label">Form Info</div>
+    </div>
+    <div class="line {% if step == 'images' or step == 'done' %}completed{% endif %}"></div>
+
+    <!-- Step 5: Images -->
+    <div class="step {% if step == 'images' %}active{% elif step == 'done' %}completed{% endif %}">
+        <div class="circle">5</div>
+        <div class="label">Images</div>
+    </div>
+    <div class="line {% if step == 'done' %}completed{% endif %}"></div>
+
+    <!-- Step 6: Done -->
+    <div class="step {% if step == 'done' %}active completed{% endif %}">
+        <div class="circle">6</div>
+        <div class="label">Done</div>
+    </div>
+
+</div>
+  
+
+
+  
+<div class="container py-5">
+
+    <!-- ============================================
+          STEP 1 — SELECT CATEGORY
+    =============================================== -->
+ 
+
+
+
+
+    {% if step == "category" %}
+    <h3 class="fw-bold mb-4">Choose Property Category</h3>
+
+    <div class="d-flex gap-3">
+        <a href="?step=base1&category=commercial" class="btn btn-primary btn-lg">
+            Commercial Property
+        </a>
+        <a href="?step=base1&category=residential" class="btn btn-success btn-lg">
+            Residential Property
+        </a>
+    </div>
+    {% endif %}
+
+
+    <!-- ============================================
+          STEP 2 — BASE PART 1 (Manual Fields)
+    =============================================== -->
+    {% if step == "base1" %}
+    <h3 class="fw-bold mb-4">{{ category|title }} — Basic Details</h3>
+
+   <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="card p-4 shadow-sm">
+
+        <!-- Title -->
+        <div class="mb-3">
+            <label class="form-label">Property Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" required></textarea>
+        </div>
+
+        <!-- Category -->    
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select" required>
+                <option value="">-- Select Category --</option>
+                <option value="residential">Residential</option>
+                <option value="commercial">Commercial</option>
+                 
+            </select>
+        </div>
+
+        <!-- Subtype -->
+        <div class="mb-3">
+            <label class="form-label">Subtype</label>
+            <select name="subtype" class="form-select" required>
+                {% if category == "commercial" %}
+                    <option value="">-- Select Subtype --</option>
+                    <option value="office">Office</option>
+                    <option value="shop">Shop</option>
+                    <option value="showroom">Showroom</option>
+                    <option value="warehouse">Warehouse</option>
+                    <option value="factory">Factory</option>
+                    <option value="land">Commercial Land</option>
+                {% elif category == "residential" %}
+                    <option value="">-- Select Subtype --</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="villa">Villa</option>
+                    <option value="townhouse">Townhouse</option>
+                    <option value="studio">Studio</option>
+                    <option value="penthouse">Penthouse</option>
+                    <option value="duplex">Duplex</option>
+                    <option value="compound">Compound</option>
+                    <option value="plot">Residential Plot</option>
+                {% else %}
+                    <option value="">Please select category first</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <!-- Property Type -->
+        <div class="mb-3">
+            <label class="form-label">Property Type</label>
+            <select name="property_type" class="form-select">
+                {% for type in property_types %}  
+                    <option value="{{ type.id }}">{{ type.name }}</option>  
+                {% endfor %}
+            </select>
+        </div>  
+
+        <!-- Companys -->
+        <div class="mb-3">
+            <label class="form-label">Companies</label>
+            <select name="company" class="form-select">
+               <option value="">-- Select Company --</option>  <!-- NEW -->
+                {% for type in  companys%}  
+                    <option value="{{ type.id }}">{{ type.name }}</option>  
+                {% endfor %}
+            </select>
+        </div>  
+        <!-- Users. -->
+        <div class="mb-3">
+            <label class="form-label">Clients </label>  
+            <select name="Client" class="form-select">
+               <option value="">-- Select Company --</option>  <!-- NEW -->
+                {% for type in Users %}      
+                    <option value="{{ type.id }}">{{ type.name }}</option>  
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="row">
+            <!-- Price -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Price</label>
+                <input type="number" name="price" class="form-control" required>
+            </div>
+
+            <!-- Price Type -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Price Type</label>
+                <select name="price_type" class="form-select">
+                    <option value="fixed">Fixed</option>
+                    <option value="negotiable">Negotiable</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Furnishing -->
+        <div class="mb-3">
+            <label class="form-label">Furnishing</label>
+            <select name="furnishing" class="form-select">
+                <option value="">-- Select --</option>
+                <option value="furnished">Furnished</option>
+                <option value="semi">Semi-Furnished</option>
+                <option value="unfurnished">Unfurnished</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <!-- Parking -->
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Parking Spaces</label>
+                <input type="number" name="parking_spaces" class="form-control">
+            </div>
+
+            <!-- Washrooms -->
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Washrooms</label>
+                <input type="number" name="washrooms" class="form-control">
+            </div>
+
+            <!-- Pantry -->
+            <div class="col-md-4 mb-3 form-check mt-4">
+                <input type="checkbox" name="pantry" class="form-check-input" id="pantry">
+                <label class="form-check-label" for="pantry">Pantry Available</label>
+            </div>
+        </div>
+
+        <!-- Deposit & Maintenance -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Deposit Amount</label>
+                <input type="number" name="deposit_amount" class="form-control">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Maintenance Fees</label>
+                <input type="number" name="maintenance_fees" class="form-control">
+            </div>
+            <div class="col-md-4 mb-3 form-check mt-4">
+                <input type="checkbox" name="service_charge_included" class="form-check-input" id="serviceCharge">
+                <label class="form-check-label" for="serviceCharge">Service Charge Included</label>
+            </div>
+        </div>  
+          
+<div id="property-fields" style="display:block;">  
+
+    <div class="row">
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Bedrooms</label>
+            <input type="text" name="bedrooms" class="form-control">
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Bathrooms</label>
+            <input type="text" name="bathrooms" class="form-control">
+        </div>
+
+        <div class="col-md-4 mb-3 form-check mt-4">
+            <input type="checkbox" name="balcony" class="form-check-input" id="balcony">
+            <label class="form-check-label" for="balcony">Balcony Available</label>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">View</label>
+            <input type="text" name="view" class="form-control">
+        </div>
+    </div>
+
+</div>
+  
+  
+
+<script>  
+document.addEventListener("DOMContentLoaded", function () {
+    const url = new URL(window.location.href);
+    const category = url.searchParams.get("category");
+    const fields = document.getElementById("property-fields");
+
+    console.log("Category from URL:", category);
+    if (!fields) {
+        console.error("property-fields element not found!");
+        return;
+    }
+
+    if (category === "residential") {
+        fields.style.display = "block";
+        console.log("Showing residential fields");
+    } else {
+        fields.style.display = "none";
+        console.log("Hiding fields");
+    }
+});
+
+</script>
+  
+
+
+
+
+        <!-- Available From -->
+        <div class="mb-3">
+            <label class="form-label">Available From</label>
+            <input type="date" name="available_from" class="form-control">
+        </div>
+
+        <!-- Property Status -->
+        <div class="mb-3">
+            <label class="form-label">Property Status</label>
+            <select name="property_status" class="form-select">
+                <option value="">-- Select --</option>
+                <option value="ready">Ready</option>
+                <option value="under_construction">Under Construction</option>
+                <option value="offplan">Off-plan</option>
+            </select>
+        </div>
+
+        <!-- Ownership -->
+        <div class="mb-3">
+            <label class="form-label">Ownership Type</label>
+            <select name="ownership_type" class="form-select">
+                <option value="">-- Select --</option>
+                <option value="freehold">Freehold</option>
+                <option value="leasehold">Leasehold</option>
+            </select>
+        </div>
+
+        <!-- Amenities -->
+        <div class="mb-3">
+            <label class="form-label">Amenities</label>
+            <select name="amenities" class="form-select" multiple>
+                {% for amenity in amenities %}
+                    <option value="{{ amenity.id }}">{{ amenity.name }}</option>
+                {% endfor %}
+            </select>
+            <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+        </div>
+
+        <!-- Featured -->
+        <div class="form-check mb-3">
+            <input type="checkbox" name="featured" class="form-check-input" id="featured">
+            <label class="form-check-label" for="featured">Mark as Featured Property</label>
+        </div>
+
+        <!-- Agent (optional) -->
+        <div class="mb-3">
+            <label class="form-label">Agent</label>
+            <select name="agent" class="form-select">
+                <option value="">-- Select Agent --</option>
+                {% for agent in agents %}
+                    <option value="{{ agent.id }}">{{ agent.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-dark mt-3">Save & Continue →</button>
+    </div>
+</form>
+  
+    {% endif %}
+
+
+   <!-- ============================================
+          STEP 3 — BASE PART 2 (Location)
+=============================================== -->
+{% if step == "base2" %}
+<h3 class="fw-bold mb-4">Location, Area & Additional Information</h3>
+
+<form method="post">
+  {% csrf_token %}
+   <!-- Location Section - Replace your existing Step 2: Location section with this -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3 bg-light p-2 rounded">
+                  Step 2: Location
+                </h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <!-- Country Field -->
+<div class="mb-3">
+  <label for="country" class="form-label">Country</label>
+  <input
+    type="text"
+    id="country"
+    name="country"
+    class="form-control"
+    placeholder="Enter country"
+  />
+</div>  
+                  </div>
+                  <div class="col-md-6">
+                    <!-- City Field -->
+<div class="mb-3">
+  <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+  <input
+    type="text"
+    id="city"
+    name="city"
+    class="form-control"
+    placeholder="Enter city"
+    required
+  />
+</div>  
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="locality" class="form-label"
+                        >Locality <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="locality"
+                        name="locality"
+                        placeholder="Enter locality"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="subLocality" class="form-label"
+                        >Sub locality</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="subLocality"  
+                        name="sub_locality"
+                        placeholder="Enter sub locality"
+                      />
+                    </div>
+                  </div>
+
+                   <div class="row" style="display:flex; gap:15px; margin-top:15px;">
+            <div class="col-md-6" style="flex:1;">
+                <label class="form-label">Built-up Area (sqft)</label>
+                <input type="number" name="area_sqft" step="0.01" class="form-control" placeholder="e.g. 1200" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+            <div class="col-md-6" style="flex:1;">
+                <label class="form-label">Super Area (sqft)</label>
+                <input type="number" name="super_area" step="0.01" class="form-control" placeholder="e.g. 1500" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+        </div>   
+
+                  <!-- Map Search Box -->
+                  <div class="col-md-12 mb-3">
+                    <label for="searchLocation" class="form-label"
+                      >Search Location</label
+                    >
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="searchLocation"
+                        class="form-control"
+                        placeholder="Search for a location (e.g., Rajwada, Indore)"
+                      />
+                      <button
+                        type="button"
+                        id="searchBtn"
+                        class="btn btn-primary"
+                      >
+                        <i class="ri-search-line"></i> Search
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Map Container -->
+                  <div class="col-md-12 mb-3">
+                    <div
+                      id="map"
+                      style="
+                        height: 250px;
+                        border-radius: 8px;
+                        border: 1px solid #ddd;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                      "
+                    ></div>
+                  </div>
+
+                  <!-- Latitude with Set Button -->
+                  <div class="col-md-6">
+                    <label for="latitude" class="form-label">Latitude</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="latitude"
+                        name="latitude"
+                        class="form-control"
+                        placeholder="Enter latitude"
+                      />
+                      <button
+                        type="button"
+                        id="setLatLng"
+                        class="btn btn-outline-primary"
+                        title="Set location from coordinates"
+                      >
+                        <i class="ri-map-pin-line"></i> Set
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Longitude with Current Location Button -->
+                  <div class="col-md-6">
+                    <label for="longitude" class="form-label">Longitude</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="longitude"
+                        name="longitude"
+                        class="form-control"
+                        placeholder="Enter longitude"
+                      />
+                      <button
+                        type="button"
+                        id="getCurrentLocation"
+                        class="btn btn-outline-success"
+                        title="Get your current location"
+                      >
+                        <i class="ri-navigation-line"></i> Current
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Selected Address Display -->
+                  <div class="col-md-12 mt-2">
+                    <label class="form-label">Selected Address</label>
+                    <input
+                      type="text"
+                      id="selectedAddress"
+                      class="form-control"
+                      name="selectedAddress"
+                      placeholder="Address will appear here when you select a location"
+                    />
+                  </div>
+                </div>
+              </div>
+
+  
+  <button class="btn btn-primary mt-3">Save & Continue →</button>
+</form>
+
+<!-- ========== Include Leaflet JS & CSS ========== -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!--Input fields hide or show ke liye -->  
+
+<!-- Put this script at the end, before </body> -->
+
+
+
+<script>
+
+
+
+
+let mapInstance, markerInstance, mapInitialized = false;
+
+function initializeMap() {
+  if (mapInitialized) return;
+
+  let defaultLat = 22.7196, defaultLng = 75.8577;
+
+  mapInstance = L.map("map").setView([defaultLat, defaultLng], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap",
+  }).addTo(mapInstance);
+
+  const customIcon = L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    shadowSize: [41, 41]
+  });
+
+  markerInstance = L.marker([defaultLat, defaultLng], { draggable: true, icon: customIcon }).addTo(mapInstance);
+
+  const latInput = $("#latitude"),
+        lngInput = $("#longitude"),
+        addressInput = $("#selectedAddress");
+
+  async function getAddressFromCoords(lat, lng) {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+    const data = await response.json();
+    return data;
+  }
+
+  async function updateLocation(lat, lng, fetchAddress = true) {
+    markerInstance.setLatLng([lat, lng]);
+    mapInstance.setView([lat, lng], 15);
+    latInput.val(lat.toFixed(6));
+    lngInput.val(lng.toFixed(6));
+
+    if (fetchAddress) {
+      addressInput.val("Fetching...");
+      const data = await getAddressFromCoords(lat, lng);
+
+      // Full formatted address
+      const displayAddress = data.display_name || "Address not found";
+      addressInput.val(displayAddress);
+
+      // Fill other fields automatically
+      if (data && data.address) fillAddressFields(data.address);
+    }
+  }
+
+  $("#searchBtn").on("click", async function () {
+    const q = $("#searchLocation").val().trim();
+    if (!q) return alert("Enter location to search");
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`);
+    const data = await res.json();
+    if (data.length) {
+      const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+      await updateLocation(lat, lng);
+    } else alert("Not found");
+  });
+
+  markerInstance.on("dragend", async function () {
+    const pos = markerInstance.getLatLng();
+    await updateLocation(pos.lat, pos.lng);
+  });
+
+  mapInstance.on("click", async function (e) {
+    await updateLocation(e.latlng.lat, e.latlng.lng);
+  });
+
+  mapInitialized = true;
+}
+
+// Auto-fill Country, City, Locality, Sub-locality
+function fillAddressFields(address) {  
+  console.log("Detected address:", address);
+
+  // Locality
+  const locality = address.suburb || address.village || address.town || address.city_district || address.city || "";
+  document.getElementById("locality").value = locality;  
+
+  // Sub-locality
+  const subLocality = address.neighbourhood || address.quarter || address.hamlet || "";
+  document.getElementById("subLocality").value = subLocality;
+
+  // 🏙️ City
+  document.getElementById("city").value =
+    address.city ||
+    address.town ||
+    address.village ||
+    address.county ||
+    address.state_district ||
+    "";
+
+  // 🌍 Country
+  document.getElementById("country").value =
+    address.country || "";
+}  
+
+document.addEventListener("DOMContentLoaded", function () {
+  setTimeout(initializeMap, 200);
+});
+</script>  
+
+
+  
+
+
+
+
+
+
+
+
+
+<script>
+    // ===========================
+// 5️⃣ Map and Location Section
+// ===========================
+
+
+function initializeMap() {
+  if (mapInitialized) return;
+
+  let defaultLat = 22.7196, defaultLng = 75.8577;
+
+  mapInstance = L.map("map").setView([defaultLat, defaultLng], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap",
+  }).addTo(mapInstance);
+
+  const customIcon = L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25, 41], iconAnchor: [12, 41], shadowSize: [41, 41]
+  });
+
+  markerInstance = L.marker([defaultLat, defaultLng], { draggable: true, icon: customIcon }).addTo(mapInstance);
+
+  const latInput = $("#latitude"), lngInput = $("#longitude"), addressInput = $("#selectedAddress");
+
+  async function getAddressFromCoords(lat, lng) {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+    const data = await response.json();
+    return data.display_name || "Address not found";
+  }
+
+  async function updateLocation(lat, lng, fetchAddress = true) {
+    markerInstance.setLatLng([lat, lng]);
+    mapInstance.setView([lat, lng], 15);
+    latInput.val(lat.toFixed(6));
+    lngInput.val(lng.toFixed(6));
+    if (fetchAddress) {
+      addressInput.val("Fetching...");
+      const address = await getAddressFromCoords(lat, lng);
+      addressInput.val(address);
+    }
+  }
+
+  $("#searchBtn").on("click", async function () {
+    const q = $("#searchLocation").val().trim();
+    if (!q) return alert("Enter location to search");
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`);
+    const data = await res.json();
+    if (data.length) {
+      const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+      await updateLocation(lat, lng);
+    } else alert("Not found");
+  });
+
+  markerInstance.on("dragend", async function () {
+    const pos = markerInstance.getLatLng();
+    await updateLocation(pos.lat, pos.lng);
+  });
+
+  mapInstance.on("click", async function (e) {
+    await updateLocation(e.latlng.lat, e.latlng.lng);   
+  });
+
+  mapInitialized = true;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  setTimeout(initializeMap, 200);
+});
+  
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> 
+{% comment %} <script src="{% static 'dashboard/js/property_form.js' %}"></script> {% endcomment %}
+
+
+
+<script>
+    function fillAddressFields(address) {
+    // Fill Locality & Sub-locality
+    document.getElementById("locality").value = address.suburb || address.district || address.city || "";
+    document.getElementById("subLocality").value = address.neighbourhood || address.quarter || "";
+
+    // Fill City dropdown if city matches
+    const citySelect = document.getElementById("city");
+    const cityValue = address.city || address.county;
+    if (citySelect && cityValue) {
+        for (let option of citySelect.options) {
+            if (option.text.toLowerCase() === cityValue.toLowerCase()) {
+                citySelect.value = option.value;
+                break;
+            }
+        }
+    }
+
+    // Fill Country dropdown if country matches
+    const countrySelect = document.getElementById("country");
+    const countryValue = address.country;
+    if (countrySelect && countryValue) {
+        for (let option of countrySelect.options) {
+            if (option.text.toLowerCase() === countryValue.toLowerCase()) {
+                countrySelect.value = option.value;
+                break;
+            }
+        }
+    }
+}
+
+// Call this when user clicks or searches a place
+function updateLocation(lat, lon) {
+    fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=YOUR_API_KEY`)
+        .then(res => res.json())
+        .then(result => {
+            if (result.features && result.features.length > 0) {
+                const address = result.features[0].properties;
+                document.getElementById("latitude").value = lat;
+                document.getElementById("longitude").value = lon;
+                document.getElementById("address").value = address.formatted;
+                fillAddressFields(address);
+            }
+        })
+        .catch(err => console.error(err));
+}
+  
+</script>
+
+
+<!-- C, City, Location -->
+  
+
+   
+
+
+{% endif %}   
+
+
+    <!-- ============================================
+          STEP 4 — SELECT SUBTYPE
+    =============================================== -->
+     
+ 
+
+     <form method="POST" class="bg-white shadow-md rounded-xl p-6 space-y-8">
+        {% csrf_token %}
+
+        <!-- ===============================
+             COMMERCIAL PROPERTY SUBTYPES
+        ================================= -->
+        {% if subtype == "office" %}
+        <div class="col-span-2 bg-white shadow-md rounded-xl p-6 border border-gray-100">
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <input name="office_type" placeholder="Office Type" class="form-input" />
+    <input name="total_desks" type="number" placeholder="Total Desks" class="form-input" />
+    <input name="ac_system" placeholder="AC System" class="form-input" />
+    <input name="floor_number" type="number" placeholder="Floor Number" class="form-input" />
+    <input name="total_floors" type="number" placeholder="Total Floors" class="form-input" />
+    <input name="view" placeholder="View" class="form-input" />
+
+    <!-- Checkboxes Section -->
+    <div class="col-span-2 mt-4 grid sm:grid-cols-3 gap-2">
+      <label class="check-item"><input type="checkbox" name="meeting_room" class="checkbox"> <span>Meeting Room</span></label>
+      <label class="check-item"><input type="checkbox" name="pantry" class="checkbox"> <span>Pantry</span></label>
+      <label class="check-item"><input type="checkbox" name="reception_area" class="checkbox"> <span>Reception Area</span></label>
+      <label class="check-item"><input type="checkbox" name="conference_room" class="checkbox"> <span>Conference Room</span></label>
+      <label class="check-item"><input type="checkbox" name="power_backup" class="checkbox"> <span>Power Backup</span></label>
+      <label class="check-item"><input type="checkbox" name="toilets_exclusive" class="checkbox"> <span>Toilets Exclusive</span></label>
+      <label class="check-item"><input type="checkbox" name="lift_available" checked class="checkbox"> <span>Lift Available</span></label>
+    </div>
+
+  </div>
+</div>
+
+        {% comment %} <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="office_type" placeholder="Office Type" class="input" />
+            <input name="total_desks" type="number" placeholder="Total Desks" class="input" />
+            <input name="ac_system" placeholder="AC System" class="input" />
+            <input name="floor_number" type="number" placeholder="Floor Number" class="input" />
+            <input name="total_floors" type="number" placeholder="Total Floors" class="input" />
+            <input name="view" placeholder="View" class="input" />
+            <label><input type="checkbox" name="meeting_room"> Meeting Room</label>
+            <label><input type="checkbox" name="pantry"> Pantry</label>
+            <label><input type="checkbox" name="reception_area"> Reception Area</label>
+            <label><input type="checkbox" name="conference_room"> Conference Room</label>
+            <label><input type="checkbox" name="power_backup"> Power Backup</label>
+            <label><input type="checkbox" name="toilets_exclusive"> Toilets Exclusive</label>
+            <label><input type="checkbox" name="lift_available" checked> Lift Available</label>
+        </div> {% endcomment %}
+
+        {% elif subtype == "shop" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="shop_type" placeholder="Shop Type" class="input" />
+            <input type="number" step="0.1" name="frontage_ft" placeholder="Frontage (ft)" class="input" />
+            <input type="number" step="0.1" name="ceiling_height" placeholder="Ceiling Height (ft)" class="input" />
+            <input type="number" step="0.1" name="power_load_kw" placeholder="Power Load (kW)" class="input" />
+            <input name="suitable_for" placeholder="Suitable For" class="input" />
+            <input type="number" name="parking_spaces" placeholder="Parking Spaces" class="input" />
+            <label><input type="checkbox" name="water_connection"> Water Connection</label>
+            <label><input type="checkbox" name="loading_dock"> Loading Dock</label>
+            <label><input type="checkbox" name="signage_allowed" checked> Signage Allowed</label>
+        </div>
+
+        {% elif subtype == "showroom" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="showroom_type" placeholder="Showroom Type" class="input" />
+            <input type="number" name="total_area" placeholder="Total Area" class="input" />
+            <input type="number" step="0.1" name="ceiling_height" placeholder="Ceiling Height" class="input" />
+            <input type="number" step="0.1" name="power_load_kw" placeholder="Power Load (kW)" class="input" />
+            <input name="suitable_for" placeholder="Suitable For" class="input" />
+            <input name="visibility" placeholder="Visibility" class="input" />
+            <input type="number" name="parking" placeholder="Parking" class="input" />
+            <label><input type="checkbox" name="glass_front"> Glass Front</label>
+            <label><input type="checkbox" name="storage_room"> Storage Room</label>
+        </div>
+
+        {% elif subtype == "warehouse" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input type="number" name="builtup_area" placeholder="Built-up Area" class="input" />
+            <input type="number" step="0.1" name="ceiling_height" placeholder="Ceiling Height" class="input" />
+            <input type="number" step="0.1" name="power_load_kw" placeholder="Power Load (kW)" class="input" />
+            <input name="road_access" placeholder="Road Access" class="input" />
+            <input type="number" name="parking_spaces" placeholder="Parking Spaces" class="input" />
+            <input name="warehouse_type" placeholder="Warehouse Type" class="input" />
+            <label><input type="checkbox" name="loading_dock"> Loading Dock</label>
+            <label><input type="checkbox" name="truck_access"> Truck Access</label>
+            <label><input type="checkbox" name="office_inside"> Office Inside</label>
+            <label><input type="checkbox" name="mezzanine"> Mezzanine</label>
+            <label><input type="checkbox" name="fire_safety"> Fire Safety</label>
+            <label><input type="checkbox" name="security_cctv"> Security CCTV</label>
+        </div>
+
+        {% elif subtype == "factory" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="factory_type" placeholder="Factory Type" class="input" />
+            <input type="number" name="plot_area" placeholder="Plot Area" class="input" />
+            <input type="number" name="builtup_area" placeholder="Built-up Area" class="input" />
+            <input type="number" name="ceiling_height" placeholder="Ceiling Height" class="input" />
+            <input type="number" name="power_load_kw" placeholder="Power Load (kW)" class="input" />
+            <input name="road_access" placeholder="Road Access" class="input" />
+            <input type="number" name="parking_area" placeholder="Parking Area" class="input" />
+            <label><input type="checkbox" name="water_connection"> Water Connection</label>
+            <label><input type="checkbox" name="loading_dock"> Loading Dock</label>
+            <label><input type="checkbox" name="cranes_equipment"> Cranes/Equipment</label>
+            <label><input type="checkbox" name="fire_safety"> Fire Safety</label>
+            <label><input type="checkbox" name="office_block"> Office Block</label>
+        </div>  
+
+        {% elif subtype == "commercialland" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="land_type" placeholder="Land Type" class="input" />
+            <input type="number" name="plot_area" placeholder="Plot Area" class="input" />
+            <input name="land_usage" placeholder="Land Usage" class="input" />
+            <input name="ownership_type" placeholder="Ownership Type" class="input" />
+            <input name="nearby_landmark" placeholder="Nearby Landmark" class="input" />
+            <input name="development_status" placeholder="Development Status" class="input" />
+            <label><input type="checkbox" name="boundary_wall"> Boundary Wall</label>
+            <label><input type="checkbox" name="road_access"> Road Access</label>
+            <label><input type="checkbox" name="corner_plot"> Corner Plot</label>
+            <label><input type="checkbox" name="electricity_available"> Electricity</label>
+            <label><input type="checkbox" name="water_connection"> Water Connection</label>
+        </div>
+
+        <!-- ===============================
+             RESIDENTIAL PROPERTY SUBTYPES
+        ================================= -->
+        {% elif subtype == "apartment" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="apartment_type" placeholder="Apartment Type" class="input" />
+            <input name="floor_number" type="number" placeholder="Floor Number" class="input" />
+            <input name="total_floors" type="number" placeholder="Total Floors" class="input" />
+            <input name="built_year" type="number" placeholder="Built Year" class="input" />
+            <label><input type="checkbox" name="central_ac"> Central AC</label>
+            <label><input type="checkbox" name="maintenance_included"> Maintenance Included</label>
+            <label><input type="checkbox" name="pets_allowed"> Pets Allowed</label>
+            <label><input type="checkbox" name="maids_room"> Maid’s Room</label>
+            <label><input type="checkbox" name="study_room"> Study Room</label>
+            <label><input type="checkbox" name="appliances_included"> Appliances Included</label>
+        </div>
+
+        {% elif subtype == "villa" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="villa_type" placeholder="Villa Type" class="input" />
+            <input name="plot_area" type="number" placeholder="Plot Area" class="input" />
+            <input name="floors" type="number" placeholder="Floors" class="input" />
+            <label><input type="checkbox" name="private_garden"> Private Garden</label>
+            <label><input type="checkbox" name="private_pool"> Private Pool</label>
+            <label><input type="checkbox" name="maids_room"> Maid’s Room</label>
+            <label><input type="checkbox" name="drivers_room"> Driver’s Room</label>
+            <label><input type="checkbox" name="storage_room"> Storage Room</label>
+            <label><input type="checkbox" name="pets_allowed"> Pets Allowed</label>
+            <label><input type="checkbox" name="covered_parking"> Covered Parking</label>
+        </div>
+
+        {% elif subtype == "townhouse" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="townhouse_type" placeholder="Townhouse Type" class="input" />
+            <input name="plot_area" type="number" placeholder="Plot Area" class="input" />
+            <input name="parking_spaces" type="number" placeholder="Parking Spaces" class="input" />
+            <label><input type="checkbox" name="private_garden"> Private Garden</label>
+            <label><input type="checkbox" name="balcony"> Balcony</label>
+            <label><input type="checkbox" name="maids_room"> Maid’s Room</label>
+            <label><input type="checkbox" name="storage_room"> Storage Room</label>
+            <label><input type="checkbox" name="community_view"> Community View</label>
+            <label><input type="checkbox" name="gated_community"> Gated Community</label>
+        </div>
+
+        {% elif subtype == "studio" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="kitchen_type" placeholder="Kitchen Type" class="input" />
+            <input name="bathroom_type" placeholder="Bathroom Type" class="input" />
+            <label><input type="checkbox" name="parking"> Parking</label>
+            <label><input type="checkbox" name="maintenance_included"> Maintenance Included</label>
+            <label><input type="checkbox" name="pets_allowed"> Pets Allowed</label>
+        </div>
+
+        {% elif subtype == "penthouse" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="floor_level" type="number" placeholder="Floor Level" class="input" />
+            <input name="floors_inside" type="number" placeholder="Floors Inside" class="input" />
+            <input name="view" placeholder="View" class="input" />
+            <input name="furnishing" placeholder="Furnishing" class="input" />
+            <label><input type="checkbox" name="private_pool"> Private Pool</label>
+            <label><input type="checkbox" name="private_elevator"> Private Elevator</label>
+            <label><input type="checkbox" name="maids_room"> Maid’s Room</label>
+            <label><input type="checkbox" name="storage_room"> Storage Room</label>
+            <label><input type="checkbox" name="terrace"> Terrace</label>
+        </div>
+
+        {% elif subtype == "duplex" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="levels" type="number" placeholder="Levels" class="input" />
+            <input name="furnishing" placeholder="Furnishing" class="input" />
+            <input name="view" placeholder="View" class="input" />
+            <input name="parking_spaces" type="number" placeholder="Parking Spaces" class="input" />
+            <label><input type="checkbox" name="balcony_terrace"> Balcony/Terrace</label>
+            <label><input type="checkbox" name="maids_room"> Maid’s Room</label>
+            <label><input type="checkbox" name="pets_allowed"> Pets Allowed</label>
+        </div>
+
+        {% elif subtype == "compound" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="compound_name" placeholder="Compound Name" class="input" />
+            <input name="total_villas" type="number" placeholder="Total Villas" class="input" />
+            <label><input type="checkbox" name="shared_pool"> Shared Pool</label>
+            <label><input type="checkbox" name="shared_gym"> Shared Gym</label>
+            <label><input type="checkbox" name="security"> Security</label>
+            <label><input type="checkbox" name="garden_area"> Garden Area</label>
+            <label><input type="checkbox" name="kids_play_area"> Kids Play Area</label>
+            <label><input type="checkbox" name="maintenance_included"> Maintenance Included</label>
+        </div>
+
+        {% elif subtype == "residentialplot" %}
+        <div class="col-span-2 grid sm:grid-cols-3 gap-2 mt-3">
+            <input name="plot_area" type="number" placeholder="Plot Area" class="input" />
+            <input name="land_use" placeholder="Land Use" class="input" />
+            <input name="development_status" placeholder="Development Status" class="input" />
+            <label><input type="checkbox" name="gated_community"> Gated Community</label>
+            <label><input type="checkbox" name="corner_plot"> Corner Plot</label>
+            <label><input type="checkbox" name="road_access"> Road Access</label>
+            <label><input type="checkbox" name="utilities_available"> Utilities Available</label>
+        </div>
+
+        
+       
+        {% endif %}
+          <div class="mt-8">
+            <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                Save & Continue →
+            </button>
+        </div>  
+         </form>    
+       
+   
+    
+    
+
+
+    <!-- ============================================
+          STEP 6 — UPLOAD IMAGES
+    =============================================== -->
+    
+     {% if step == "images" %}
+    <h3 class="fw-bold mb-4">Upload Property Media</h3>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+    
+        <label class="form-label fw-bold">Main Images (Multiple Allowed)</label>
+        <input type="file" name="images" multiple class="form-control mb-4">
+    
+        <hr>
+    
+        <!-- ############## CATEGORY BASED FIELDS ############## -->
+        {% if category == "residential" %}
+            <h5 class="fw-bold mt-3">Residential Specific Images</h5>
+    
+            <label class="form-label">Exterior Image</label>
+            <input type="file" name="exterior_image" class="form-control mb-3">
+    
+            <label class="form-label">Living Room Image</label>
+            <input type="file" name="living_room_image" class="form-control mb-3">
+    
+            <label class="form-label">Bedroom Image</label>
+            <input type="file" name="bedroom_image" class="form-control mb-3">
+    
+            <label class="form-label">Kitchen Image</label>
+            <input type="file" name="kitchen_image" class="form-control mb-3">
+    
+            <label class="form-label">Bathroom Image</label>
+            <input type="file" name="bathroom_image" class="form-control mb-3">
+    
+            <label class="form-label">Floor Plan</label>
+            <input type="file" name="floor_plan_image" class="form-control mb-3">
+    
+            <label class="form-label">Master Plan</label>
+            <input type="file" name="master_plan_image" class="form-control mb-3">
+    
+            <label class="form-label">Location Map</label>
+            <input type="file" name="location_map_image" class="form-control mb-3">
+    
+            <label class="form-label fw-bold">360° Image</label>
+            <input type="file" name="image_360" class="form-control mb-3">
+        
+            <label class="form-label fw-bold">Video URL</label>
+            <input type="text" name="video_url" class="form-control mb-3">
+        
+            <label class="form-label fw-bold">Video File</label>
+            <input type="file" name="video_file" class="form-control mb-3">
+    
+        {% elif category == "commercial" %}
+            <h5 class="fw-bold mt-3">Commercial Specific Images</h5>
+    
+            <label class="form-label">Exterior Image</label>
+            <input type="file" name="exterior_image" class="form-control mb-3">
+    
+            <label class="form-label">Showroom Image</label>
+            <input type="file" name="showroom_image" class="form-control mb-3">
+    
+            <label class="form-label">Office Image</label>
+            <input type="file" name="office_image" class="form-control mb-3">
+    
+            <label class="form-label">Warehouse Image</label>
+            <input type="file" name="warehouse_image" class="form-control mb-3">
+    
+            <label class="form-label">Floor Plan</label>
+            <input type="file" name="floor_plan_image" class="form-control mb-3">
+    
+            <label class="form-label">Master Plan</label>
+            <input type="file" name="master_plan_image" class="form-control mb-3">
+    
+            <label class="form-label">Location Map</label>
+            <input type="file" name="location_map_image" class="form-control mb-3">
+    
+            <label class="form-label fw-bold">360° Image</label>
+            <input type="file" name="image_360" class="form-control mb-3">
+        
+            <label class="form-label fw-bold">Video URL</label>
+            <input type="text" name="video_url" class="form-control mb-3">
+        
+            <label class="form-label fw-bold">Video File</label>
+            <input type="file" name="video_file" class="form-control mb-3">
+    
+        {% endif %}
+       
+    
+        <button class="btn btn-success mt-4">Upload & Finish →</button>
+    </form>
+    {% endif %}
+
+
+
+    <!-- ============================================
+          STEP 7 — DONE
+    =============================================== -->
+    {% if step == "done" %}
+    <div class="alert alert-success text-center py-5">
+        <h3 class="fw-bold">✅ Property Successfully Added!</h3>  
+        <a href="/dashboard/property/add" class="btn btn-primary mt-3">Go to Dashboard</a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>  
+</main>
+<!-- ============================================
+     GOOGLE MAPS AUTOCOMPLETE SCRIPT
+=============================================== -->
+{% if step == "base2" %}
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_API_KEY&libraries=places"></script>
+<script>
+    let autocomplete, map, marker;
+
+    function initAutocomplete() {
+        const input = document.getElementById("map_address");
+        autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.addListener("place_changed", fillAddress);
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 25.2048, lng: 55.2708 }, // Default: Dubai
+            zoom: 13
+        });
+    }
+
+    function fillAddress() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+
+        document.getElementById("latitude").value = lat;
+        document.getElementById("longitude").value = lng;
+
+        // Move map
+        map.setCenter({ lat, lng });
+        map.setZoom(15);
+
+        if (marker) marker.setMap(null);
+        marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: map
+        });
+    }
+
+    window.onload = initAutocomplete;
+</script>
+
+
+
+<!--For Step Bar -->
+
+  
+<script>
+  let currentStep = 1;
+const totalSteps = 5;
+
+function updateStepper() {
+  const steps = document.querySelectorAll(".step");
+  const lines = document.querySelectorAll(".line");
+
+  steps.forEach((step, index) => {
+    step.classList.remove("active", "completed");
+    if (index + 1 < currentStep) {
+      step.classList.add("completed");
+      if (lines[index]) lines[index].classList.add("completed");
+    } else {
+      if (lines[index]) lines[index].classList.remove("completed");
+    }
+  });
+
+  if (steps[currentStep - 1]) steps[currentStep - 1].classList.add("active");
+}
+
+function nextStep() {
+  if (currentStep < totalSteps) {
+    currentStep++;
+    updateStepper();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    updateStepper();
+  }
+}
+
+updateStepper();
+</script>
+{% endif %}
+
+
+ {% endblock content %}

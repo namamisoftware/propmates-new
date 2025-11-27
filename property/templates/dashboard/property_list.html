@@ -1,0 +1,185 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %} All Properties {% endblock %}
+
+{% block content %}
+
+<main class="app-wrapper">
+  <div class="container-fluid">
+
+```
+<!-- 🔹 Top Navigation Bar -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 my-3 border-bottom pb-3">
+  <div class="flex-shrink-0">
+    <h2 class="breadcrumb-title mb-0 fs-5 fw-bold">Residential & Commercial</h2>    
+  </div>
+
+  <div class="flex-grow-1 d-flex justify-content-center">
+    <form method="get" class="d-flex flex-wrap align-items-center gap-2 gap-md-3 w-100 justify-content-center">
+      <input 
+        type="text" 
+        name="q" 
+        class="form-control flex-grow-1" 
+        placeholder="🔍 Search by title..." 
+        value="{{ search }}" 
+        style="min-width: 200px; max-width: 350px; height: 44px;"
+      >
+      <select name="category" class="form-select" style="min-width: 150px; max-width: 200px; height: 44px;">
+        <option value="">All Categories</option>
+        <option value="residential" {% if category == "residential" %}selected{% endif %}>Residential</option>
+        <option value="commercial" {% if category == "commercial" %}selected{% endif %}>Commercial</option>
+      </select>
+      <button class="btn btn-primary px-4" style="height: 44px;">Search</button>
+    </form>
+  </div>
+
+  <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 flex-shrink-0">
+    <a href="{% url 'add_property_wizard' %}" class="btn btn-primary text-white px-3 py-2">+ Add New Property</a>
+    <a href="{% url 'add_property' %}" class="btn btn-success text-white px-3 py-2">Add Simple Property</a>  
+  </div>
+</div>
+
+<!-- ⚡ Messages -->
+{% if messages %}
+  <div class="container-fluid my-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- 📋 Property Table with Horizontal Scroll -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body" style="overflow-x: auto;">
+        <table class="table table-nowrap table-striped table-bordered w-100">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th class="text-center">Title</th>
+              <th class="text-center">Category</th>
+              <th class="text-center">Subtype</th> 
+              <th class="text-center">Price</th>
+              <th class="text-center">Agent</th>
+              <th>Address</th>  
+              <th>Available From</th>
+              <th class="text-center">Status & Verified</th>  
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in properties %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><strong>{{ p.title }}</strong><br><small class="text-muted">{{ p.description|truncatewords:10 }}</small></td>
+              <td class="text-capitalize">{{ p.category }}</td>  
+              <td class="text-capitalize">{{ p.subtype }}</td>
+              <td>₹ {{ p.price|floatformat:0 }}</td>
+              <td>{% if p.agent %}{{ p.agent.name }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+              <td>{{ p.city }}, {{ p.country }}</td>
+              <td>{{ p.available_from|default:"—" }}</td>   
+              <td>
+                <div class="d-flex justify-content-between align-items-center">    
+                  <span id="status-text-{{ p.id }}"
+                      class="fw-semibold 
+                        {% if p.status == 'Active' %}text-success
+                        {% elif p.status == 'Inactive' %}text-danger
+                        {% elif p.status == 'Pending' %}text-warning
+                        {% endif %}">
+                    {{ p.status }}   
+                  </span>
+                  <select onchange="update_N_Status({{ p.id }}, this.value, '{{ p.model_type }}')"
+                          class="form-select form-select-sm w-auto ms-2 mt-1 mt-md-0">
+                    <option value="Active"   {% if p.status == 'Active' %}selected{% endif %}>Active</option>
+                    <option value="Inactive" {% if p.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="Pending"  {% if p.status == 'Pending' %}selected{% endif %}>Pending</option>
+                  </select>
+
+                   <select onchange="assignAgent({{ p.id }}, this.value, '{{ p.model_type }}')"
+                           class="form-select form-select-sm w-auto ms-2 mt-1 mt-md-0">
+                   
+                       <option value="">Select Agent</option>
+                   
+                       {% for agent in agents %}
+                           <option value="{{ agent.id }}"
+                               {% if p.assign_id == agent.id %}
+                                   selected
+                               {% endif %}>
+                               {{ agent.name }}      
+                           </option>
+                       {% endfor %}
+                   
+                   </select>
+
+                </div>
+              </td>
+              <td>
+                <div class="dropdown dropdown-menu-end text-center">
+                  <button class="btn p-0 text-center" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      {% if p|instanceof:"CommercialProperty" %}
+                        <a class="dropdown-item" href="{% url 'property_detail' 'commercial' p.id %}">View</a>
+                      {% elif p|instanceof:"ResidentialProperty" %}
+                        <a class="dropdown-item" href="{% url 'property_detail' 'residential' p.id %}">View</a>
+                      {% endif %}
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'edit_property' p.id %}">Edit</a></li>
+                    <li>
+                      {% if p|instanceof:"CommercialProperty" %}
+                        <a class="dropdown-item text-danger" href="{% url 'property_delete' 'commercial' p.id %}" onclick="return confirm('Are you sure?');">Delete</a>
+                      {% elif p|instanceof:"ResidentialProperty" %}
+                        <a class="dropdown-item text-danger" href="{% url 'property_delete' 'residential' p.id %}" onclick="return confirm('Are you sure?');">Delete</a>
+                      {% endif %}
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" class="text-center py-4 text-muted">No properties found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</main>
+
+<script>  
+function update_N_Status(id, new_status, modelType) {    
+    fetch(`/dashboard/updateStatus/${id}/`, {    
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ status: new_status, model: modelType })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const statusEl = document.getElementById(`status-text-${id}`);
+            statusEl.textContent = data.status;
+            statusEl.classList.remove("text-success", "text-danger", "text-warning");
+            if (data.status === "Active") statusEl.classList.add("text-success");
+            if (data.status === "Inactive") statusEl.classList.add("text-danger");
+            if (data.status === "Pending") statusEl.classList.add("text-warning");
+        }
+    })
+    .catch(err => console.error(err));
+}
+</script>
+
+{% endblock content %}
+   

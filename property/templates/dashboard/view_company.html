@@ -1,0 +1,180 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %} Companies {% endblock %}
+      
+{% block content %}
+
+<main class="app-wrapper">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="main-breadcrumb d-flex align-items-center my-3">
+            <h2 class="breadcrumb-title mb-0 flex-grow-1 fs-14">Companies</h2>
+            <a href="{% url 'add_company' %}" class="btn btn-primary text-white">Add Company</a>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="my-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Table Card -->
+        <div class="card">
+            <div class="card-body">
+
+                <!-- RESPONSIVE WRAPPER -->
+                <div class="table-responsive">
+
+                <table 
+                    id="buttons-datatables"
+                    class="table table-striped table-bordered table-hover align-middle text-nowrap w-100">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>S no.</th>
+                            <th>Logo</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Slug</th>
+                            <th>Website</th>
+                            <th>State</th>
+                            <!-- <th>Country</th> -->  
+                            <th>Verified</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for row in company %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+
+                            <td>
+                                {% if row.image %}
+                                <img src="{{ row.image.url }}" class="rounded shadow-sm company-logo">
+                                {% else %}
+                                <img src="{% static 'images/default.png' %}" class="rounded shadow-sm company-logo">
+                                {% endif %}
+                            </td>
+
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.email }}</td>
+                            <td>{{ row.phone }}</td>
+                            <td>{{ row.address }}</td>
+                            <td>{{ row.slug }}</td>
+
+                            <td>
+                                {% if row.website %}
+                                <a href="{{ row.website }}" target="_blank">{{ row.website }}</a>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+
+                            <td>{{ row.state }}</td>
+                            <!-- <td>{{ row.country }}</td> -->
+
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span id="verified-badge-{{ row.id }}" 
+                                          class="badge {% if row.verified %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if row.verified %}Yes{% else %}No{% endif %}
+                                    </span>
+                                    <select class="form-select form-select-sm w-auto"
+                                            onchange="updateVerifiedStatus({{ row.id }}, this.value)">
+                                        <option value="1" {% if row.verified %}selected{% endif %}>Verified</option>
+                                        <option value="0" {% if not row.verified %}selected{% endif %}>Not Verified</option>
+                                    </select>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'edit_company' row.id %}">Edit</a></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger"
+                                               onclick="return confirm('Are you sure you want to delete this company?');"
+                                               href="{% url 'delete_company' row.id %}">
+                                                Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+                </div> 
+                <!-- end responsive wrapper -->
+
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- JS: Verified Update -->
+<script>
+function updateVerifiedStatus(companyId, newValue) {
+    fetch(`/dashboard/company/update-verified/${companyId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ verified: newValue })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "ok") {
+            let badge = document.getElementById(`verified-badge-${companyId}`);
+            if (newValue == "1") {
+                badge.className = "badge bg-success";
+                badge.innerText = "Yes";
+            } else {
+                badge.className = "badge bg-danger";
+                badge.innerText = "No";
+            }
+        }
+    });
+}
+</script>
+
+<!-- Make images small on mobile -->
+<style>
+.company-logo {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+}
+@media (max-width: 576px) {
+    .company-logo {
+        width: 35px !important;
+        height: 35px !important;
+    }
+    table td, table th {
+        white-space: normal !important;
+        word-break: break-word;
+    }
+}
+</style>
+
+{% endblock %}
+   

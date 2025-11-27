@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-3xl w-full bg-white shadow-lg rounded-xl p-6">
+    <!-- Header Section -->
+    <div class="flex items-center mb-6">
+      {% if agent.image %}
+        <img src="{{ agent.image.url }}" alt="{{ agent.name }}" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-500 mr-6">
+      {% else %}
+        <img src="/static/default-avatar.png" alt="No Image" class="w-24 h-24 rounded-full object-cover border-4 border-gray-300 mr-6">
+      {% endif %}
+
+      <div>
+        <h2 class="text-2xl font-semibold text-gray-800">{{ agent.name }}</h2>
+        <p class="text-gray-500 text-sm">{{ agent.email }}</p>
+        <span class="inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium
+          {% if agent.status == 'Active' %}
+            bg-green-100 text-green-700
+          {% elif agent.status == 'Inactive' %}
+            bg-red-100 text-red-700
+          {% else %}
+            bg-yellow-100 text-yellow-700
+          {% endif %}
+        ">
+          {{ agent.status }}
+        </span>
+      </div>
+    </div>
+
+    <hr class="my-4 border-gray-200">
+
+    <!-- Details Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full border border-gray-200 rounded-lg">
+        <tbody class="divide-y divide-gray-100">
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700 w-1/3">Phone</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.phone }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Experience (years)</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.experience_years }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Closed Deals</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.closed_deals }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Country</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.country }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">State</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.state }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">City</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.city }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Pincode</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.pincode }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Address</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.address }}</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Rating</th>
+            <td class="px-4 py-2 text-gray-600 font-medium">{{ agent.rating }}/5 ⭐</td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <th class="text-left px-4 py-2 font-medium text-gray-700">Created At</th>
+            <td class="px-4 py-2 text-gray-600">{{ agent.created_at }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Back Button -->
+    <!-- Uncomment if needed -->    
+    
+    <a href="{% url 'view_member' %}" class="inline-block mt-5 text-indigo-600 hover:text-indigo-800 font-medium">
+      ← Back to Team
+    </a>   
+    
+  </div>  
+
+</body>
+</html>

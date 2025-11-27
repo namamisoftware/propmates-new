@@ -1,0 +1,518 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block title %} Dashboard {% endblock %}
+
+      
+      {% block content %}
+      <main class="app-wrapper">
+        <div class="container-fluid">
+          <div
+            class="main-breadcrumb d-flex align-items-center my-3 position-relative"
+          >
+            <div class="flex-shrink-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-end mb-0">
+                  <li class="breadcrumb-item">
+                    <a href="javascript:void(0)">Dashboard</a>
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xxl-8">
+              <div class="row h-100">
+                <div class="col-xl-4 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-50px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-folder2-open"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.properties }}</h3>
+                        <span class="fs-5">Total Property</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-50px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-bookmark"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.users }}</h3>
+                        <span class="fs-5">Total Register User</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-48px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-bookmark"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.contact_queries }}</h3>
+                        <span class="fs-5">Contact Query</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4">
+              <div class="card overflow-hidden bg-primary card-h-100 p-4">
+                <div class="row">
+                  <div class="col-8">
+                    <div class="vector-image">
+                      <img
+                        class="img-fluid welcome-img w-200px mb-n20 mt-n5"
+                        src="{% static 'assets/images/dashboard/upgrade-img.png' %}"
+                        alt="CRM Vector"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-end">
+                      <p class="mb-5 fs-16 fw-semibold text-white">Welcome</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+           <div class="row">
+            <div class="col-xxl-12">
+              <div class="row h-100">
+                <div class="col-xl-3 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-50px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-folder2-open"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.companies }}</h3>
+                        <span class="fs-5">Total Companies</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-50px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-bookmark"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.agents }}</h3>
+                        <span class="fs-5">Total Team Members</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-48px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-bookmark"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.blogs }}</h3>
+                        <span class="fs-5">Total Blog Posts</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  <div class="col-xl-3 col-sm-6">
+                  <div class="card card-h-100">
+                    <div
+                      class="card-body d-flex align-items-center justify-content-around"
+                    >
+                      <div
+                        class="h-48px w-48px position-relative d-flex justify-content-center align-items-center text-primary fs-4 rounded-3 shadow-lg border"
+                      >
+                        <i class="bi bi-bookmark"></i>
+                      </div>
+                      <div>
+                        <h3>{{ totals.sliders }}</h3>
+                        <span class="fs-5">Total Slider</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div class="row">
+            <div class="col-xl-8">
+              <div class="card card-h-100">
+                <div class="card-header">
+                  <h4>Today Register user</h4>
+                  
+                </div>
+                <div class="card-body">
+                  <div class="table-box table-responsive">
+                    <table class="table table-hover text-nowrap">
+                      <thead class="table-light border-0">
+                        <tr>
+                          <th>S no.</th>
+                  <th>User Type</th>
+                  <th>Name</th>
+                  
+                  <th>Phone</th>
+                  <th>Country</th>
+                 
+                  <th>Assigned Agent</th>
+                  <th>Action</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                     <tbody>
+                {% for row in todayuser %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  
+                  <td>
+                    {% if row.user_type == 0 %}Individual
+                    {% elif row.user_type == 1 %}Company
+                    {% else %}Unknown
+                    {% endif %}
+                  </td>
+                  
+                  <td>{{ row.name }}</td>
+                 
+                  <td>{{ row.phone }}</td>
+                  
+                  <td>
+                    {% if row.country %}
+                      {{ row.country.name }}
+                    {% else %}
+                      N/A
+                    {% endif %}
+                  </td>
+                  
+                  
+                  <!-- Assigned Agent Column -->
+                  <td>
+                    <select class="form-select form-select-sm assign-agent-dropdown" 
+                            data-user-id="{{ row.id }}"
+                            style="min-width: 150px;">
+                      <option value="">Select Agent</option>
+                      {% for agent in agents %}
+                        <option value="{{ agent.id }}" 
+                                {% if row.assigned_agent_id == agent.id %}selected{% endif %}>
+                          {{ agent.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                    
+                    {% if row.assigned_agent %}
+                      <small class="text-muted d-block mt-1">
+                        Current: {{ row.assigned_agent.name }}
+                      </small>
+                    {% endif %}
+                  </td>
+                  
+                  <td>
+                    <div class="dropdown dropdown-menu-end">
+                      <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots"></i>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li>
+                          {# <a class="dropdown-item" href="{% url 'user' row.id %}">View</a> #}
+                          {# <a class="dropdown-item" href="">View Profile</a> #}
+                        </li>
+                        <li>
+                          {# <a class="dropdown-item" href="{% url 'user' row.id %}">View</a> #}
+                          <a class="dropdown-item" href="">View property</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="" 
+                             onclick="return confirm('Are you sure you want to delete this member?');">Delete</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+           <div class="col-xl-4">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h4>Property Stats</h4>
+        <p class="mb-0 text-muted">Track your property</p>
+      </div>
+      <a href="{% url 'view_property' %}" class="link">View All</a>
+    </div>
+    <div class="card-body">
+      <div class="position-relative">
+        <div id="product-statistics"></div>
+        <div class="product-chart text-center">
+          <h3>{{ totals.properties }}</h3>
+          <p class="mb-0 badge bg-success py-1 rounded-pill">Property Status</p>
+          {% comment %} <span class="badge bg-success py-1 rounded-pill">+5.34%</span> {% endcomment %}
+        </div>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <div>Buy</div>
+        <div>
+          <span class="badge bg-primary-subtle text-primary px-2 rounded-3">
+            {{ totals.buy_property }}
+          </span>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <div>Rent</div>
+        <div>
+          <span class="badge bg-warning-subtle text-warning px-2 rounded-3">
+            {{ totals.rent_property }}
+          </span>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between">
+        <div>New Project</div>
+        <div>
+          <span class="badge bg-danger-subtle text-danger px-2 rounded-3">
+            {{ totals.new_property }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+           <div class="col-12">
+                <div class="card">
+                  <!--start::card-->
+                    <div class="card-header">
+                  <h4>Today Register Property</h4>
+                  
+                </div>
+                  <div class="card-body">
+                   
+                    <!-- start:: Buttons Datatables -->
+                    <table
+                      id="buttons-datatables"
+                      class="table table-nowrap table-striped table-bordered w-100"
+                    >
+                      <thead>
+                        <tr>
+                          <th>S no.</th>
+                          <th>User Name</th>
+
+                          <th>Looking To</th>
+                          <th>Property Type</th>
+
+                          
+                          <th>Name</th>
+                          <th>Country</th>
+                          <th>City</th>
+
+
+                        
+                          
+
+                        
+                          <th>Action</th>
+
+                        </tr>
+                      </thead>
+             <tbody>
+  {% for row in property %}
+  <tr>
+   
+
+    <td>{{ forloop.counter }}</td> 
+<td>{{ row.user_name|default:"N/A" }}</td>
+    <td>
+      {% if row.looking_to == 1 %}Buy
+      {% elif row.looking_to == 2 %}Rent
+      {% elif row.looking_to == 3 %}Commercial Buy
+      {% elif row.looking_to == 4 %}Commercial Rent
+      {% elif row.looking_to == 5 %}New Project
+      {% else %}Unknown
+      {% endif %}
+    </td>
+
+<td>
+  {% if row.property_type %}
+    {{ row.property_type.name }}
+  {% else %}
+    N/A
+  {% endif %}
+</td>
+
+
+
+    <!-- Property Name -->
+    <td>{{ row.name }}</td>
+
+   <td>
+  {% if row.country %}
+    {{ row.country.name }}
+  {% else %}
+    N/A
+  {% endif %}
+</td>
+
+    <!-- City -->
+    <td>{{ row.city }}</td>
+
+    <td>
+      <div class="dropdown dropdown-menu-end">
+        <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-three-dots"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="dropdown-item" href="">View</a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="{% url 'delete_property' row.id %}" 
+               onclick="return confirm('Are you sure you want to delete this member?');">Delete</a>
+          </li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+      </table>
+                    <!-- end:: Buttons Datatables -->
+                  </div>
+                </div>
+                <!--end::card-->
+              </div>
+          </div>
+        </div>
+
+        <!-- Submit Section -->
+      </main>
+      <script>
+// Property Statistics Radial Bar Chart
+document.addEventListener('DOMContentLoaded', function() {
+    // Get data from Django context
+    const buyCount = {{ totals.buy_property|default:0 }};
+    const rentCount = {{ totals.rent_property|default:0 }};
+    const newProjectCount = {{ totals.new_property|default:0 }};
+    
+    // Calculate total for percentage calculation
+    const totalProperties = buyCount + rentCount + newProjectCount;
+    
+    // Calculate percentages for radial bars (0-100 scale)
+    let buyPercentage = 0;
+    let rentPercentage = 0;
+    let newProjectPercentage = 0;
+    
+    if (totalProperties > 0) {
+        buyPercentage = Math.round((buyCount / totalProperties) * 100);
+        rentPercentage = Math.round((rentCount / totalProperties) * 100);
+        newProjectPercentage = Math.round((newProjectCount / totalProperties) * 100);
+    }
+    
+    // ApexCharts Radial Bar Configuration
+    var options = {
+        series: [buyPercentage, rentPercentage, newProjectPercentage],
+        chart: {
+            height: 330,
+            type: "radialBar",
+        },
+        plotOptions: {
+            radialBar: {
+                offsetY: 0,
+                startAngle: 0,
+                endAngle: 270,
+                hollow: {
+                    margin: 5,
+                    size: "30%",
+                    background: "transparent",
+                    image: undefined,
+                },
+                track: {
+                    margin: 10,
+                },
+                dataLabels: {
+                    name: {
+                        show: false,
+                    },
+                    value: {
+                        show: false,
+                    },
+                },
+                barLabels: {
+                    enabled: true,
+                    useSeriesColors: true,
+                    offsetX: -8,
+                    fontSize: "16px",
+                    formatter: function (seriesName, opts) {
+                        // Display actual count instead of percentage
+                        const counts = [buyCount, rentCount, newProjectCount];
+                        return seriesName + ":  " + counts[opts.seriesIndex];
+                    },
+                },
+            },
+        },
+        colors: ["#5b66eb", "#ffc107", "#dc3545"],
+        labels: ["Buy", "Rent", "New Project"],
+        responsive: [
+            {
+                breakpoint: 480,
+                options: {
+                    legend: {
+                        show: false,
+                    },
+                },
+            },
+        ],
+    };
+    
+    var chart = new ApexCharts(
+        document.querySelector("#product-statistics"),
+        options
+    );
+    chart.render();
+    
+    // Update the center total count
+    document.querySelector('.product-chart h3').textContent = totalProperties.toLocaleString();
+});
+</script>
+   
+{% endblock content %}
+     
+  

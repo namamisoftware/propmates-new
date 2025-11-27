@@ -1,0 +1,1606 @@
+{% extends "dashboard/base.html" %} {% load static %} {% block title %} Property
+{% endblock %} {% block content %}
+<main class="app-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <form action="" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="card mt-6">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Property Listing</h5>
+            </div>
+            <div class="card-body">
+              <!-- Step 1: Basic Info -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3">Step 1: Basic Information</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="name" class="form-label"
+                        >Property Name</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        name="name"
+                        placeholder="Enter property name"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="lookingTo" class="form-label"
+                        >Looking to <span class="text-danger">*</span></label
+                      >
+                      <select
+                        id="lookingTo"
+                        name="looking_to"
+                        class="form-select"
+                        required
+                      >
+                        <option value="0" selected disabled>Select</option>
+                        <option value="1">Buy</option>
+                        <option value="2">Rent</option>
+                        <option value="3">Commercial Buy</option>
+                        <option value="4">Commercial Rent</option>
+                        <option value="5">New Project</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="propertyType" class="form-label"
+                        >Property type <span class="text-danger">*</span></label
+                      >
+                      <select
+                        id="propertyType"
+                        name="property_type"
+                        class="form-select"
+                        required
+                      >
+                        <option selected disabled>
+                          Select First Looking To
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="company" class="form-label">Company</label>
+                      <select
+                        class="form-select"
+                        id="company"
+                        name="company_id"
+                      >
+                        <option selected disabled>Select Company</option>
+                        {% for company in companies %}
+                        <option value="{{ company.id }}">
+                          {{ company.name }}
+                        </option>
+                        {% endfor %}  
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Location Section - Replace your existing Step 2: Location section with this -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3 bg-light p-2 rounded">
+                  Step 2: Location
+                </h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="country" class="form-label">Country</label>
+                      <select id="country" name="country" class="form-select">
+                        <option selected disabled>Select Country</option>
+                        {% for country in countries %}
+                        <option value="{{ country.id }}">
+                          {{ country.name }}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="city" class="form-label"
+                        >City <span class="text-danger">*</span></label
+                      >
+                      <select
+                        class="form-select"
+                        id="city"
+                        name="city"
+                        required
+                      >
+                        <option selected disabled>Select City</option>    
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="locality" class="form-label"
+                        >Locality <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="locality"
+                        name="locality"
+                        placeholder="Enter locality"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="subLocality" class="form-label"
+                        >Sub locality</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="subLocality"
+                        name="sub_locality"
+                        placeholder="Enter sub locality"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Map Search Box -->
+                  <div class="col-md-12 mb-3">
+                    <label for="searchLocation" class="form-label"
+                      >Search Location</label
+                    >
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="searchLocation"
+                        class="form-control"
+                        placeholder="Search for a location (e.g., Rajwada, Indore)"
+                      />
+                      <button
+                        type="button"
+                        id="searchBtn"
+                        class="btn btn-primary"
+                      >
+                        <i class="ri-search-line"></i> Search
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Map Container -->
+                  <div class="col-md-12 mb-3">
+                    <div
+                      id="map"
+                      style="
+                        height: 250px;
+                        border-radius: 8px;
+                        border: 1px solid #ddd;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                      "
+                    ></div>
+                  </div>
+
+                  <!-- Latitude with Set Button -->
+                  <div class="col-md-6">
+                    <label for="latitude" class="form-label">Latitude</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="latitude"
+                        name="latitude"
+                        class="form-control"
+                        placeholder="Enter latitude"
+                      />
+                      <button
+                        type="button"
+                        id="setLatLng"
+                        class="btn btn-outline-primary"
+                        title="Set location from coordinates"
+                      >
+                        <i class="ri-map-pin-line"></i> Set
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Longitude with Current Location Button -->
+                  <div class="col-md-6">
+                    <label for="longitude" class="form-label">Longitude</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="longitude"
+                        name="longitude"
+                        class="form-control"
+                        placeholder="Enter longitude"
+                      />
+                      <button
+                        type="button"
+                        id="getCurrentLocation"
+                        class="btn btn-outline-success"
+                        title="Get your current location"
+                      >
+                        <i class="ri-navigation-line"></i> Current
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Selected Address Display -->
+                  <div class="col-md-12 mt-2">
+                    <label class="form-label">Selected Address</label>
+                    <input
+                      type="text"
+                      id="selectedAddress"
+                      class="form-control"
+                      name="address"
+                      placeholder="Address will appear here when you select a location"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3: Property Profile -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3 bg-light p-2 rounded">
+                  Step 3: Property Profile
+                </h6>
+                <div id="dynamicFieldsContainer"></div>
+                <div class="row" id="propertyProfileFields">
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="bedrooms" class="form-label"
+                        >Bedrooms <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="bedrooms"
+                        name="bedrooms"
+                        value="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="bathrooms" class="form-label"
+                        >Bathrooms <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="bathrooms"
+                        name="bathrooms"
+                        value="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="balconies" class="form-label"
+                        >Balconies <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="balconies"
+                        name="balconies"
+                        value="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4" id="area_in">
+                    <div class="mb-3">
+                      <label for="areain" class="form-label">Area in</label>
+                      <select id="areain" name="area_unit" class="form-select">
+                        <option value="" selected disabled>
+                          Select Option
+                        </option>
+                        <option value="Sq.Ft">Sq.Ft</option>
+                        <option value="sq.Yd">sq.Yd</option>
+                        <option value="Sq.Mt">Sq.Mt</option>
+                        <option value="Acre">Acre</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="carpetArea" class="form-label"
+                        >Carpet area <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="carpetArea"
+                        name="carpet_area"
+                        value="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="builtupArea" class="form-label"
+                        >Builtup area</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="builtupArea"
+                        name="builtup_area"
+                        value="0"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="superBuiltupArea" class="form-label"
+                        >Super builtup area</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="superBuiltupArea"
+                        name="super_builtup_area"
+                        value="0"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="furnishingStatus" class="form-label"
+                        >Furnishing status
+                        <span class="text-danger">*</span></label
+                      >
+                      <select
+                        class="form-select"
+                        id="furnishingStatus"
+                        name="furnishing_status"
+                        required
+                      >
+                        <option value="furnished" selected>Furnished</option>
+                        <option value="semi_furnished">Semi Furnished</option>
+                        <option value="unfurnished">Unfurnished</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="mb-3">
+                      <label for="currency" class="form-label">Currency</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="currency"
+                        name="currency"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="expectedPrice" class="form-label"
+                        >Expected price</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="expectedPrice"
+                        name="expected_price"
+                        placeholder="Enter expected price"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mt-5 mb-3">
+                      <div class="form-check form-switch">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="allInclusive"
+                          name="all_inclusive"
+                        />
+                        <label class="form-check-label" for="allInclusive"
+                          >All inclusive</label
+                        >
+                      </div>
+                      <div class="form-check form-switch">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="priceNegotiable"
+                          name="price_negotiable"
+                          checked
+                        />
+                        <label class="form-check-label" for="priceNegotiable"
+                          >Price negotiable</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="mb-3">
+                      <label for="description" class="form-label"
+                        >Description</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="description"
+                        name="description"
+                        rows="6"
+                        placeholder="Enter property description"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="parkingSpaces" class="form-label"
+                        >Covered Parking spaces
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="parkingSpaces"
+                        name="parking_spaces"
+                        value="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="parkingSpaces" class="form-label"
+                        >Open Parking spaces
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="parkingSpaces"
+                        name="parking_type"
+                        value="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>   
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="facing" class="form-label">Facing</label>
+                      <select class="form-select" id="facing" name="facing">
+                        <option selected disabled>Select value</option>
+                        <option value="north">North</option>
+                        <option value="south">South</option>
+                        <option value="east">East</option>
+                        <option value="west">West</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 4: Media -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3 bg-light p-2 rounded">
+                  Step 4: Media
+                </h6>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="images" class="form-label"
+                        >Upload Images<label
+                      >
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="images"
+                        name="image1"
+                        accept="image/*"
+                        multiple
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="images" class="form-label"
+                        >Second Image</label
+                      >
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="images"
+                        name="image2"
+                        accept="image/*"
+                        multiple
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="images" class="form-label"
+                        >Masterplan Image</label
+                      >
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="images"
+                        name="image3"
+                        accept="image/*"
+                        multiple
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="video" class="form-label">Video</label>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="video"
+                        name="video"
+                        accept="video/*"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="brochure" class="form-label">Brochure</label>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="brochure"
+                        name="brochure"
+                        accept=".pdf,.doc,.docx"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 5: Amenities -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3 bg-light p-2 rounded">
+                  Step 5: Amenities
+                </h6>
+                <div class="row">
+                  <div class="col-md-5">
+                    <label class="form-label">Available amenities</label>
+                    <div
+                      class="border rounded p-3"
+                      style="height: 300px; overflow-y: auto"
+                    >
+                      <p class="text-muted small">
+                        Choose amenities by selecting them and then select the
+                        "Choose" arrow button.
+                      </p>
+                      <input
+                        type="text"
+                        class="form-control mb-3"
+                        placeholder="Filter"
+                        id="amenityFilter"
+                      />
+                      <div class="amenity-list">
+                        {% for amenity in amenities %}
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="amenities"
+                            value="{{ amenity.id }}"
+                            id="amenity{{ amenity.id }}"
+                          />
+                          <label
+                            class="form-check-label"
+                            for="amenity{{ amenity.id }}"
+                            >{{ amenity.name }}</label
+                          >
+                        </div>
+                        {% endfor %}
+                      </div>
+                      <button
+                        type="button"
+                        class="btn btn-link text-primary p-0 mt-3"
+                      >
+                        Choose all amenities
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-2 d-flex flex-column justify-content-center align-items-center"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary mb-2"
+                      id="moveRight"
+                    >
+                      →
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      id="moveLeft"
+                    >
+                      ←
+                    </button>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Chosen amenities</label>
+                    <div
+                      class="border rounded p-3"
+                      style="height: 300px; overflow-y: auto"
+                    >
+                      <p class="text-muted small">
+                        Remove amenities by selecting them and then select the
+                        "Remove" arrow button.
+                      </p>
+                      <input
+                        type="text"
+                        class="form-control mb-3"
+                        placeholder="Filter"
+                      />
+                      <div id="chosenAmenities" class="py-5"></div>
+                      <button
+                        type="button"
+                        class="btn btn-link text-danger p-0 mt-3"
+                      >
+                        Remove all amenities
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 6: Payment Plans -->
+              <div class="mb-4">
+                <h6 class="fw-semibold mb-3 bg-light p-2 rounded">
+                  Step 6: Payment Plans
+                </h6>
+                <div id="paymentPlansContainer">
+                  <div class="row payment-plan-row mb-3">
+                    <div class="col-md-6">
+                      <input
+                        type="text"
+                        name="payment_name[]"
+                        class="form-control"
+                        placeholder="Payment name"
+                      />
+                    </div>
+                    <div class="col-md-5">
+                      <input
+                        type="number"
+                        name="payment_amount[]"
+                        class="form-control"
+                        placeholder="Amount"
+                      />
+                    </div>
+                    <div class="col-md-1 d-flex align-items-center">
+                      <button type="button" class="btn btn-danger remove-plan">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  id="addPaymentPlan"
+                  class="btn btn-outline-primary btn-sm mt-2"
+                >
+                  + Add Payment Plan
+                </button>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="row">
+                <div class="col-12 text-end">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i>Submit Property
+                  </button>  
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Include your JS here (your existing jQuery scripts for amenities, payment plan, country → currency, etc.) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // 🏠 When "Looking To" changes → update Property Type dropdown
+    $("#lookingTo").on("change", function () {
+      const lookingToId = $(this).val();
+      $("#propertyType").html("<option>Loading...</option>");
+      $.get(`/dashboard/ajax/property-types/${lookingToId}/`, function (data) {
+        let options = "<option disabled selected>Select Property Type</option>";
+        data.forEach((item) => {
+          options += `<option value="${item.id}">${item.name}</option>`;
+        });
+        $("#propertyType").html(options);  
+      });
+    });
+
+    // 🌍 When "Country" changes → update Currency
+    $("#country").on("change", function () {
+      const countryId = $(this).val();
+      $.get(`/dashboard/ajax/country-info/${countryId}/`, function (data) {
+        $("#currency").val(data.currency || "");
+      });
+    });
+
+    // 💸 Add More Payment Plan
+    $("#addPaymentPlan").on("click", function () {
+      const planHtml = `
+      <div class="row payment-plan-row mb-3">
+        <div class="col-md-6">
+          <input type="text" name="payment_name[]" class="form-control" placeholder="Payment name">
+        </div>
+        <div class="col-md-5">
+          <input type="number" name="payment_amount[]" class="form-control" placeholder="Amount">
+        </div>
+        <div class="col-md-1 d-flex align-items-center">
+          <button type="button" class="btn btn-danger remove-plan">✕</button>
+        </div>
+      </div>`;
+      $("#paymentPlansContainer").append(planHtml);
+    });
+
+    // ❌ Remove Payment Plan Row
+    $(document).on("click", ".remove-plan", function () {
+      $(this).closest(".payment-plan-row").remove();
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function () {
+    // ➡️ Move selected amenities to "Chosen"
+    $("#moveRight").on("click", function () {
+      // Get all checked amenities
+      $(".amenity-list input:checked").each(function () {
+        const id = $(this).val();
+        const label = $('label[for="amenity' + id + '"]').text();
+
+        // Create a new checkbox in the chosen area
+        const chosen = `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="amenities" value="${id}" id="chosenAmenity${id}">
+          <label class="form-check-label" for="chosenAmenity${id}">${label}</label>
+        </div>
+      `;
+        $("#chosenAmenities").append(chosen);
+        // Remove it from available list
+        $(this).closest(".form-check").remove();
+      });
+    });
+
+    // ⬅️ Move selected amenities back to "Available"
+    $("#moveLeft").on("click", function () {
+      $("#chosenAmenities input:checked").each(function () {
+        const id = $(this).val();
+        const label = $('label[for="chosenAmenity' + id + '"]').text();
+
+        // Recreate in available list
+        const available = `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="amenities" value="${id}" id="amenity${id}">
+          <label class="form-check-label" for="amenity${id}">${label}</label>
+        </div>
+      `;
+        $(".amenity-list").append(available);
+        $(this).closest(".form-check").remove();
+      });
+    });
+
+    // 🧹 Optional: Choose all amenities at once
+    $(".btn-link.text-primary").on("click", function () {
+      $(".amenity-list input").prop("checked", true);
+      $("#moveRight").click(); // Move them all to chosen
+    });
+
+    // 🧹 Optional: Remove all from chosen
+    $(".btn-link.text-danger").on("click", function () {
+      $("#chosenAmenities input").prop("checked", true);
+      $("#moveLeft").click();
+    });
+
+    // 🔍 Filter amenities in available list
+    $("#amenityFilter").on("keyup", function () {
+      const search = $(this).val().toLowerCase();
+      $(".amenity-list .form-check").each(function () {
+        const label = $(this).text().toLowerCase();
+        $(this).toggle(label.includes(search));
+      });
+    });
+  });
+</script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Map Initialization Script -->
+<script>
+  // 🗺️ MAP SETUP - Initialize map first
+  let mapInstance;
+  let markerInstance;
+  let mapInitialized = false;
+
+  function initializeMap() {
+    if (mapInitialized) return;
+
+    // Default location (Indore, India)
+    let defaultLat = 22.7196;
+    let defaultLng = 75.8577;
+
+    // Create map
+    mapInstance = L.map("map").setView([defaultLat, defaultLng], 13);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap",
+    }).addTo(mapInstance);
+
+    // Custom marker icon
+    const customIcon = L.icon({
+      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+
+    // Add draggable marker
+    markerInstance = L.marker([defaultLat, defaultLng], {
+      draggable: true,
+      icon: customIcon,
+    }).addTo(mapInstance);
+
+    markerInstance
+      .bindPopup("<b>Selected Location</b><br>Drag to change!")
+      .openPopup();
+
+    // Get input references
+    const latInput = document.getElementById("latitude");
+    const lngInput = document.getElementById("longitude");
+    const addressInput = document.getElementById("selectedAddress");
+
+    // Function to get address from coordinates
+    async function getAddressFromCoords(lat, lng) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        );
+        const data = await response.json();
+        return data.display_name || "Address not found";
+      } catch (error) {
+        console.error("Error fetching address:", error);
+        return "Error fetching address";
+      }
+    }
+
+    // Function to update location
+    async function updateLocation(
+      lat,
+      lng,
+      shouldGetAddress = true,
+      zoomLevel = 15
+    ) {
+      markerInstance.setLatLng([lat, lng]);
+      mapInstance.setView([lat, lng], zoomLevel);
+      latInput.value = lat.toFixed(6);
+      lngInput.value = lng.toFixed(6);
+
+      if (shouldGetAddress) {
+        addressInput.value = "Fetching address...";
+        const address = await getAddressFromCoords(lat, lng);
+        addressInput.value = address;
+      }
+    }
+
+    // 🔍 SEARCH BUTTON
+    document
+      .getElementById("searchBtn")
+      .addEventListener("click", async function () {
+        const query = document.getElementById("searchLocation").value.trim();
+        if (!query) {
+          alert("Please enter a location to search");
+          return;
+        }
+
+        this.innerHTML = '<i class="ri-loader-4-line"></i> Searching...';
+        this.disabled = true;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+              query
+            )}&limit=1`
+          );
+          const data = await response.json();
+
+          if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            await updateLocation(lat, lng);
+            addressInput.value = data[0].display_name;
+          } else {
+            alert("Location not found. Please try another search.");
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          alert("Error searching location");
+        } finally {
+          this.innerHTML = '<i class="ri-search-line"></i> Search';
+          this.disabled = false;
+        }
+      });
+
+    // Enter key for search
+    document
+      .getElementById("searchLocation")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.getElementById("searchBtn").click();
+        }
+      });
+
+    // 📍 SET LAT/LNG BUTTON
+    document
+      .getElementById("setLatLng")
+      .addEventListener("click", async function () {
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
+
+        if (isNaN(lat) || isNaN(lng)) {
+          alert("Please enter valid latitude and longitude");
+          return;
+        }
+
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          alert("Invalid coordinates.\nLat: -90 to 90, Lng: -180 to 180");
+          return;
+        }
+
+        await updateLocation(lat, lng);
+      });
+
+    // 🌍 GET CURRENT LOCATION BUTTON
+    document
+      .getElementById("getCurrentLocation")
+      .addEventListener("click", function () {
+        if (navigator.geolocation) {
+          this.innerHTML = '<i class="ri-loader-4-line"></i> Getting...';
+          this.disabled = true;
+
+          const btn = this;
+          navigator.geolocation.getCurrentPosition(
+            async function (position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              await updateLocation(lat, lng);
+              btn.innerHTML = '<i class="ri-navigation-line"></i> Current';
+              btn.disabled = false;
+            },
+            function (error) {
+              alert(
+                "Unable to get location. Please enable location permission."
+              );
+              btn.innerHTML = '<i class="ri-navigation-line"></i> Current';
+              btn.disabled = false;
+            }
+          );
+        } else {
+          alert("Geolocation is not supported by your browser");
+        }
+      });
+
+    // 🖱️ MARKER DRAG
+    markerInstance.on("dragend", async function (e) {
+      const position = markerInstance.getLatLng();
+      await updateLocation(position.lat, position.lng);
+    });
+
+    // 🗺️ MAP CLICK
+    mapInstance.on("click", async function (e) {
+      await updateLocation(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Initialize address
+    getAddressFromCoords(defaultLat, defaultLng).then((address) => {
+      addressInput.value = address;
+    });
+
+    // 🌍 GLOBAL FUNCTION for Country/City Updates
+    window.updateMapLocation = async function (locationName, zoomLevel = 12) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            locationName
+          )}&limit=1`
+        );
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          await updateLocation(lat, lng, true, zoomLevel);
+          addressInput.value = data[0].display_name;
+        }
+      } catch (error) {
+        console.error("Map update error:", error);
+      }
+    };
+
+    // 🌍 Make marker and map accessible globally for locality updates
+    window.markerInstance = markerInstance;
+    window.mapInstance = mapInstance;
+
+    mapInitialized = true;
+  }
+
+  // Initialize map when document is ready
+  document.addEventListener("DOMContentLoaded", function () {
+    // Small delay to ensure map container is visible
+    setTimeout(initializeMap, 100);
+  });
+</script>
+<script>
+  $(document).ready(function () {
+    // 🌍 COUNTRY CHANGE
+    $("#country").on("change", function () {
+      let countryId = $(this).val();
+      $("#city").html("<option>Loading...</option>");
+
+      $.ajax({
+        url: `/dashboard/ajax/country-info/${countryId}/`,
+        method: "GET",
+        success: function (res) {
+          if (res.name) {
+            let countryName = res.name;
+
+            // 🗺️ Update map to country location with country-level zoom
+            if (typeof window.updateMapLocation === "function") {
+              window.updateMapLocation(countryName, 5);
+            }
+
+            // Get cities by country name
+            $.ajax({
+              url: "https://countriesnow.space/api/v0.1/countries/cities",
+              method: "POST",
+              data: JSON.stringify({ country: countryName }),
+              contentType: "application/json",
+              success: function (response) {
+                $("#city").empty();
+                if (response.data && response.data.length > 0) {
+                  $("#city").append(
+                    "<option selected disabled>Select City</option>"
+                  );
+                  response.data.forEach(function (city) {
+                    $("#city").append(
+                      '<option value="' + city + '">' + city + "</option>"
+                    );
+                  });
+                } else {
+                  $("#city").append(
+                    "<option disabled>No cities found</option>"
+                  );
+                }
+              },
+              error: function () {
+                $("#city").html(
+                  "<option disabled>Error fetching cities</option>"
+                );
+              },
+            });
+          }
+        },
+      });
+    });
+
+    // 🏙️ CITY CHANGE
+    $("#city").on("change", function () {
+      let cityName = $(this).val();
+      let countryName = $("#country option:selected").text().trim();
+
+      if (cityName && cityName !== "Select City" && cityName !== "Loading...") {
+        if (typeof window.updateMapLocation === "function") {
+          // Search with "City, Country" format for better accuracy
+          window.updateMapLocation(cityName + ", " + countryName, 12);
+        }
+
+        // 🏘️ Enable locality autocomplete for selected city
+        window.selectedCity = cityName;
+        window.selectedCountry = countryName;
+      }
+    });
+
+    // 🌍 When "Country" changes → update Currency (existing code)
+    $("#country").on("change", function () {
+      const countryId = $(this).val();
+      $.get(`/dashboard/ajax/country-info/${countryId}/`, function (data) {
+        $("#currency").val(data.currency || "");
+      });
+    });
+
+    let localityTimeout;
+    let localitySuggestions = [];
+
+    $("#locality").on("input", function () {
+      const localityInput = $(this).val().trim();
+
+      clearTimeout(localityTimeout);
+      $("#localitySuggestions").remove();
+
+      if (localityInput.length < 3) return;
+
+      if (!$("#localityLoading").length) {
+        $(this).after(
+          '<div id="localityLoading" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none;"><span style="display:inline-block;width:16px;height:16px;border:2px solid #f3f3f3;border-top:2px solid #3498db;border-radius:50%;animation:spin 1s linear infinite;"></span></div>'
+        );
+      }
+
+      localityTimeout = setTimeout(function () {
+        const city = window.selectedCity || "";
+        const country = window.selectedCountry || "";
+        const searchQuery = `${localityInput}, ${city}, ${country}`;
+
+        fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            searchQuery
+          )}&limit=5`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            $("#localityLoading").remove();
+
+            if (data && data.length > 0) {
+              localitySuggestions = data;
+
+              let suggestionsHtml =
+                '<div id="localitySuggestions" style="position:absolute;top:100%;left:0;right:0;border:1px solid #ddd;background:white;z-index:1000;max-height:300px;overflow-y:auto;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">';
+
+              data.forEach((item, index) => {
+                const mainName =
+                  item.display_name.split(",")[0] || item.display_name;
+                const displayName = item.display_name;
+
+                suggestionsHtml += `
+              <button type="button" class="locality-suggestion" data-index="${index}"
+                style="display:block;width:100%;text-align:left;padding:10px 12px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee;font-family:inherit;">
+                <strong>${mainName}</strong>
+                <small style="color:#666;font-size:0.85em;">${displayName}</small>
+              </button>
+            `;
+              });
+
+              suggestionsHtml += "</div>";
+
+              $("#locality").parent().css("position", "relative");
+              $("#locality").after(suggestionsHtml);
+            }
+          })
+          .catch((err) => {
+            console.error("Locality search error:", err);
+            $("#localityLoading").remove();
+          });
+      }, 500);
+    });
+
+    // 🏘️ Handle locality suggestion click
+    $(document).on("click", ".locality-suggestion", function () {
+      const index = $(this).data("index");
+      const selected = localitySuggestions[index];
+
+      if (selected) {
+        // Update locality input
+        $("#locality").val(selected.name);
+
+        // Update map location
+        if (typeof window.updateMapLocation === "function") {
+          const lat = parseFloat(selected.lat);
+          const lng = parseFloat(selected.lon);
+
+          if (window.markerInstance && window.mapInstance) {
+            window.markerInstance.setLatLng([lat, lng]);
+            window.mapInstance.setView([lat, lng], 15);
+            $("#latitude").val(lat.toFixed(6));
+            $("#longitude").val(lng.toFixed(6));
+            $("#selectedAddress").val(selected.display_name);
+          }
+        }
+      }
+
+      // Remove suggestions
+      $("#localitySuggestions").remove();
+    });
+
+    // Close suggestions when clicking outside
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest("#locality").length) {
+        $("#localitySuggestions").remove();
+      }
+    });
+  });
+</script>
+<script>
+  $(document).ready(function () {
+    // 🔹 Make toggleFields globally accessible
+    window.toggleFields = function () {
+      const val = $("#lookingTo").val();
+      const container = $("#dynamicFieldsContainer");
+      container.empty(); // reset
+
+      // Commercial Buy or Rent (3 or 4) → hide beds/baths/balconies
+      if (val == 3 || val == 4) {
+        $("#bedrooms").closest(".col-md-4").hide();
+        $("#bathrooms").closest(".col-md-4").hide();
+        $("#balconies").closest(".col-md-4").hide();
+      } else {
+        $("#bedrooms").closest(".col-md-4").show();
+        $("#bathrooms").closest(".col-md-4").show();
+        $("#balconies").closest(".col-md-4").show();
+      }
+
+      // Rent or Commercial Rent (2 or 4) → hide price fields
+      if (val == 2 || val == 4) {
+        $("#expectedPrice").closest(".col-md-6").hide();
+        $("#currency").closest(".col-md-2, .col-md-1").hide();
+        $("#priceNegotiable").closest(".col-md-4, .col-md-2").hide();
+        $("#allInclusive").closest(".col-md-4, .col-md-2").hide();
+      } else {
+        $("#expectedPrice").closest(".col-md-6").show();
+        $("#currency").closest(".col-md-2, .col-md-1").show();
+        $("#priceNegotiable").closest(".col-md-4, .col-md-2").show();
+        $("#allInclusive").closest(".col-md-4, .col-md-2").show();
+      }
+
+      // RENT or COMMERCIAL RENT (2 or 4)
+      if (val == 2 || val == 4) {
+        const leaseField = `
+        <div class="row">
+          <div class="col-md-4">
+            <div id="companyLeaseWrapper" class="mb-3">
+              <label class="form-label">Company Lease</label>
+              <select id="companyLease" name="lease" class="form-select">
+                <option value="" selected disabled>Select Option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div id="availableFromWrapper" class="mb-3">
+              <label class="form-label">Available From</label>
+              <select id="availableFrom" name="available_from" class="form-select">
+                <option value="" selected disabled>Select Option</option>
+                <option value="Immediately">Immediately</option>
+                <option value="Later">Later</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label">Rent In</label>
+              <select id="rentType" name="rent_type" class="form-select">
+                <option value="" selected disabled>Select Option</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+                <option value="Half-Yearly">Half-Yearly</option>
+                <option value="Quarterly">Quarterly</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="mb-3">
+              <label class="form-label">Currency</label>
+              <input type="text" class="form-control" name="currency" readonly>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label class="form-label">Rent</label>
+              <input type="text" name="rent_price" class="form-control">
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label class="form-label">Maintenance Amount</label>
+              <input type="text" name="maintenance_price" class="form-control">
+            </div>
+          </div>
+        </div>
+      `;
+        container.append(leaseField);
+      }
+
+      // BUY / NEW PROJECT / COMMERCIAL BUY
+      else if (val == 1 || val == 3 || val == 5) {
+        const possessionField = `
+        <div id="possessionWrapper" class="mb-3">
+          <label class="form-label">Possession</label>
+          <select id="possession" name="possession" class="form-select">
+            <option value="" selected disabled>Select Option</option>
+            <option value="Ready to Use">Ready to Use</option>
+            <option value="Under Construction">Under Construction</option>
+          </select>
+        </div>
+      `;
+        container.append(possessionField);
+      }
+    };
+
+    // 🧭 Trigger toggle on page load and on select change
+    toggleFields();
+    $("#lookingTo").on("change", toggleFields);
+
+    // 🧭 Available From → Show Date if Later
+    $(document).on("change", "#availableFrom", function () {
+      if ($(this).val() === "Later") {
+        if (!$("#availableDateWrapper").length) {
+          $(this).closest("#availableFromWrapper").after(`
+          <div class="col-md-12" id="availableDateWrapper">
+            <div class="mb-3">
+              <label class="form-label">Available Date</label>
+              <input type="date" name="available_date" class="form-control">
+            </div>
+          </div>
+        `);
+        }
+      } else {
+        $("#availableDateWrapper").remove();
+      }
+    });
+
+    // 🧭 Possession → Show Possession Date if Under Construction
+    $(document).on("change", "#possession", function () {
+      if ($(this).val() === "Under Construction") {
+        if (!$("#possessionDateWrapper").length) {
+          $(this).closest("#possessionWrapper").after(`
+          <div class="col-md-12" id="possessionDateWrapper">
+            <div class="mb-3">
+              <label class="form-label">Possession Date</label>
+              <input type="date" name="possession_date" class="form-control">
+            </div>
+          </div>
+        `);
+        }
+      } else {
+        $("#possessionDateWrapper").remove();
+      }
+    });
+
+    // 🔁 Property Type change handler
+    $("#propertyType").on("change", function () {
+      const typeId = $(this).val();
+
+      $.get(`/dashboard/ajax/property-type/${typeId}/`, function (data) {
+        if (data.plot == 1) {
+          // 🧱 Plot type
+          $("#propertyProfileFields").html(`
+            <div class="col-md-4" id="area_in">
+            <div class="mb-3">
+              <label for="areain" class="form-label">Area in</label>
+              <select id="areain" name="area_unit" class="form-select">
+                <option value="" selected disabled>Select Option</option>
+                <option value="Sq.Ft">Sq.Ft</option>
+                <option value="sq.Yd">sq.Yd</option>
+                <option value="Sq.Mt">Sq.Mt</option>
+                <option value="Acre">Acre</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="plotArea" class="form-label">Plot Area </label>
+              <input type="number" class="form-control" id="plotArea" name="ploat_area" min="0" placeholder="Enter plot area">
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="plotNo" class="form-label">Plot Number</label>
+              <input type="text" class="form-control" id="plotNo" name="ploat_no" placeholder="Enter plot number">
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="mb-3">
+              <label for="loanAvailable" class="form-label">Loan Available</label>
+              <select class="form-select" id="loanAvailable" name="loan_available">
+                <option value="" selected disabled>Select Option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+            <div class="col-md-1">
+                    <div class="mb-3">
+                      <label for="currency" class="form-label">Currency</label>
+                      <input type="text" class="form-control" id="currency" name="currency" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="expectedPrice" class="form-label">Expected price</label>
+                      <input type="number" class="form-control" id="expectedPrice" name="expected_price" placeholder="Enter expected price" min="0">
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="mt-5 mb-3">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="allInclusive" name="all_inclusive">
+                        <label class="form-check-label" for="allInclusive">All inclusive</label>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="priceNegotiable" name="price_negotiable" checked>
+                        <label class="form-check-label" for="priceNegotiable">Price negotiable</label>
+                      </div>
+                    </div>
+                  </div>
+                   <div class="col-md-3">
+                    <div class="mb-3">
+                      <label for="facing" class="form-label">Facing</label>
+                      <select class="form-select" id="facing" name="facing">
+                        <option selected disabled>Select value</option>
+                        <option value="north">North</option>
+                        <option value="south">South</option>
+                        <option value="east">East</option>
+                        <option value="west">West</option>
+                      </select>
+                    </div>
+                  </div>
+        `);
+        } else {
+          // 🏠 Apartment type
+          $("#propertyProfileFields").html(`
+          <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="bedrooms" class="form-label">Bedrooms <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="bedrooms" name="bedrooms" value="0" min="0" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="bathrooms" class="form-label">Bathrooms <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="bathrooms" name="bathrooms" value="0" min="0" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="balconies" class="form-label">Balconies <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="balconies" name="balconies" value="0" min="0" required>
+                    </div>
+                  </div>
+ <div class="col-md-4" id="area_in">
+            <div class="mb-3">
+              <label for="areain" class="form-label">Area in</label>
+              <select id="areain" name="area_unit" class="form-select">
+                <option value="" selected disabled>Select Option</option>
+                <option value="Sq.Ft">Sq.Ft</option>
+                <option value="sq.Yd">sq.Yd</option>
+                <option value="Sq.Mt">Sq.Mt</option>
+                <option value="Acre">Acre</option>
+              </select>
+            </div>
+          </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="carpetArea" class="form-label">Carpet area <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="carpetArea" name="carpet_area" value="0" min="0" required>
+                      
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="builtupArea" class="form-label">Builtup area</label>
+                      <input type="number" class="form-control" id="builtupArea" name="builtup_area" value="0" min="0">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="superBuiltupArea" class="form-label">Super builtup area</label>
+                      <input type="number" class="form-control" id="superBuiltupArea" name="super_builtup_area" value="0" min="0">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="furnishingStatus" class="form-label">Furnishing status <span class="text-danger">*</span></label>
+                      <select class="form-select" id="furnishingStatus" name="furnishing_status" required>
+                        <option value="furnished" selected>Furnished</option>
+                        <option value="semi_furnished">Semi Furnished</option>
+                        <option value="unfurnished">Unfurnished</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="mb-3">
+                      <label for="currency" class="form-label">Currency</label>
+                      <input type="text" class="form-control" id="currency" name="currency" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="expectedPrice" class="form-label">Expected price</label>
+                      <input type="number" class="form-control" id="expectedPrice" name="expected_price" placeholder="Enter expected price" min="0">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mt-5 mb-3">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="allInclusive" name="all_inclusive">
+                        <label class="form-check-label" for="allInclusive">All inclusive</label>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="priceNegotiable" name="price_negotiable" checked>
+                        <label class="form-check-label" for="priceNegotiable">Price negotiable</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="dynamicFieldsContainer"></div>
+                  <div class="col-md-12">
+                    <div class="mb-3">
+                      <label for="description" class="form-label">Description</label>
+                      <textarea class="form-control" id="description" name="description" rows="6" placeholder="Enter property description"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="parkingSpaces" class="form-label">Covered Parking spaces <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="parkingSpaces" name="parking_spaces" value="0" min="0" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="parkingSpaces" class="form-label">Open Parking spaces <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="parkingSpaces" name="parking_type" value="0" min="0" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="facing" class="form-label">Facing</label>
+                      <select class="form-select" id="facing" name="facing">
+                        <option selected disabled>Select value</option>
+                        <option value="north">North</option>
+                        <option value="south">South</option>
+                        <option value="east">East</option>
+                        <option value="west">West</option>
+                      </select>
+                    </div>
+                  </div>
+          <div id="dynamicFieldsContainer"></div>
+        `);
+        }
+
+        // ✅ Re-run toggle logic after new HTML is added
+        toggleFields();
+      });
+    });
+  });
+</script>
+
+{% endblock content %}
